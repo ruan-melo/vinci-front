@@ -1,0 +1,82 @@
+/**
+ * This injects Tailwind's base styles and any base styles registered by
+ * plugins.
+ */
+ @tailwind base;
+
+ /**
+  * This injects Tailwind's component classes and any component classes
+  * registered by plugins.
+  */
+ @tailwind components;
+ 
+ /**
+  * This injects Tailwind's utility classes and any utility classes registered
+  * by plugins.
+  */
+ @tailwind utilities;
+ 
+ /**
+  * Use this directive to control where Tailwind injects the hover, focus,
+  * responsive, dark mode, and other variants of each class.
+  *
+  * If omitted, Tailwind will append these classes to the very end of
+  * your stylesheet by default.
+  */
+ @tailwind variants;
+
+ body {
+  min-height: 100vh;
+  height: 100%;
+  min-height: -webkit-fill-available;
+}
+
+#__next{
+  height: 100%;
+}
+
+html {
+  min-height: 100vh;
+  height: 100%;
+  min-height: -webkit-fill-available;
+}
+
+ @layer base {
+  html {
+    font-family: 'Roboto', sans-serif;
+    color: theme(colors.gray.700);
+  }
+}
+
+.modal {
+  transition: all 0.4s ease-in-out;
+  /* overflow: hidden;
+  z-index: 999;
+  padding: 40px 20px 20px;
+  opacity: 0; */
+  pointer-events: none;
+  opacity:0;
+  transform: translateY(-10%);
+}
+
+
+.modal-enter-done {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0%);
+}
+.modal-exit {
+  opacity: 0;
+  transform: translateY(-10%);
+}
+
+.modal-content {
+  width: 70%;
+  height: 70%;
+  background-color: #282c34;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
