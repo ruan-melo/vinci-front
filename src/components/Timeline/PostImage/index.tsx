@@ -7,6 +7,7 @@ interface PostImageProps {
 }
 
 export const PostImage = ({post, onClick}: PostImageProps) => {
+    console.log('post', post)
     return (
         <div>
             <div onClick={() => {

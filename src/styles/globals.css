@@ -25,6 +25,24 @@
   */
  @tailwind variants;
 
+ /* The components layer is for class-based styles that you want to be able to override with utilities.  */
+ @layer components {
+  .btn {
+    @apply flex items-center justify-center transition-all duration-200 font-bold py-2 px-4;
+  }
+
+  .btn-primary {
+    @apply bg-green-700 hover:bg-green-800 text-white;
+  }
+  
+}
+
+@layer utilities{
+  .btn-outline{
+    @apply bg-none;
+  }
+}
+
  body {
   min-height: 100vh;
   height: 100%;

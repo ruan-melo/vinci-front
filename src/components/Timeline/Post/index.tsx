@@ -7,9 +7,10 @@ import { Textarea } from "../../Textarea";
 import { useDisclosure } from "@chakra-ui/hooks"
 import { Comment } from "./Comment";
 import { Like } from "./Like";
-import { PostWithMedia } from "../../../models";
+import { PostWithMedia, PostWithMediaAndAuthor } from "../../../models";
+import UserAvatar from '../../../assets/default-user.svg'
 
-export interface PostProps extends PostWithMedia {
+export interface PostProps extends PostWithMediaAndAuthor {
     liked: boolean;
 }
 
@@ -23,7 +24,7 @@ const btnTextArea =  {
     )
 }
 
-export const Post = ({caption, liked: likedProp}: PostProps) => {
+export const Post = ({caption, author, medias, liked: likedProp}: PostProps) => {
     const { isOpen: isModalCommentsOpen, onOpen: onOpenModalComments, onClose: onCloseModalComments } = useDisclosure()
     const { isOpen: isModalLikesOpen, onOpen: onOpenModalLikes, onClose: onCloseModalLikes} = useDisclosure()
     const [liked, setLiked] = useState(likedProp)
@@ -63,23 +64,22 @@ export const Post = ({caption, liked: likedProp}: PostProps) => {
     return (
         <div className='flex flex-col w-full h-full'>
             <div className='relative p-0 w-full'>
-                <Image className='' src='/eu.png' alt='post' width='450px' height='550px' objectFit="contain"  />       
+                <Image className='' src={medias[0].media_url} alt='post' width='450px' height='550px' objectFit="cover"  />       
             </div>
 
             <div className='box-border border-none px-4 py-2 bg-opacity-40 flex flex-col gap-2 max-w-full text-gray-700'>
                 <div className='flex gap-4 items-center overflow-'>
                     <div className='w-10 h-10 rounded-full overflow-hidden'>
-                        <Image src='/eu.png' width={'50px'} height={'50px'} objectFit='cover' alt={"Foto de perfil"}/>
+                        <Image className='bg-gray-300 fill-current' src={author.avatar_url ?? UserAvatar} width={'50px'} height={'50px'} objectFit='cover' alt={"Foto de perfil"}/>
                     </div>
                     <div className='flex flex-col '>
-                        Ruan Tenório de Melo
-                        <span className='text-xs w-full text-left'>@ruantmelo</span>
+                        {author.name}
+                        <span className='text-xs w-full text-left'>@{author.profile_name}</span>
                     </div>
                 </div>
                 
-                <p className='max-w-full break-all text-sm '>
-                    #Cria
-                </p>
+                {caption ? <p className='max-w-full break-all text-sm '>{caption}</p> : null}
+        
             </div>    
             <div className='flex items-center px-2   gap-4'>
                 <div  className='cursor-pointer flex items-center  bg-opacity-30 p-2  gap-2 text-sm text-gray-500'>
@@ -118,15 +118,25 @@ export const Post = ({caption, liked: likedProp}: PostProps) => {
 
             
 
-            <div className='px-4'>
-                <Textarea name="new-comment" inputClassName="resize-none 
+            <div className=''>
+                <Textarea name="new-comment" 
+                    inputClassName="resize-none 
+                    transition-all
+                    
+                    duration-300
                     bg-gray-100
-                    border-transparent
-                    focus:border-gray-500 focus:bg-white focus:ring-0" 
+                    px-4
+                    rounded-none
+                    focus:ring-0
+                    focus:bg-gray-200
+                    " 
                     placeholder="Add a comment" 
                     rows={1}
                     button={
                        btnTextArea
+                    }
+                    icon={
+                        <AnnotationIcon className=' h-5 w-5 text-gray-400 '/>
                     }
                     />
                

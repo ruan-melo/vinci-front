@@ -19,6 +19,8 @@ export interface Post {
 
 export type PostWithMedia = Post & {medias: Media[]};
 
+export type PostWithMediaAndAuthor = PostWithMedia & {author: User};
+
 export interface UserWithPosts extends User {
     posts: Post[];
 }
