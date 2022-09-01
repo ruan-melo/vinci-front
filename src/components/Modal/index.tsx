@@ -50,7 +50,7 @@ export const Modal = ({title, children, isOpen, closeModal, className, container
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className={` w-full  transform overflow-hidden rounded-md bg-white p-6 text-left align-middle shadow-xl transition-all ${className}`}>
+                <Dialog.Panel className={` w-full  transform overflow-hidden rounded-md bg-white text-left align-middle shadow-xl transition-all ${className}`}>
                   {title &&   <Dialog.Title
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900 flex-shrink-0"

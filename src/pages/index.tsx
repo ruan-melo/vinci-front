@@ -1,5 +1,6 @@
 import { GetServerSideProps, NextPage } from "next"
 import { parseCookies } from "nookies"
+// import { ImagesC } from "../components/ImagesCarousel"
 import { Header } from "../components/Header"
 import { Timeline } from "../components/Timeline"
 import { useAuth } from "../hooks/useAuth"

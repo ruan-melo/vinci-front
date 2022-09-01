@@ -20,9 +20,6 @@ export const NewPost = () => {
 
     const files = watch('files');
 
-
-    console.log('files', files);
-
    const handleClose = () => {
          formRef.current?.reset();
          closeModal();
@@ -30,8 +27,6 @@ export const NewPost = () => {
 
     const handlePost = async (data: Inputs) => {
         //TODO: Validar a quantidade de arquivos
-        console.log('data', data,  new File([data.files[0]], data.files[0].name, {type: data.files[0].type}));
-
         const body = new FormData();
 
         Array(data.files.length).fill(0).forEach((_, index) => {
@@ -46,7 +41,6 @@ export const NewPost = () => {
         body.append('caption', data.caption);
         // body.append('medias',  JSON.stringify([{position: 0, mediaName: data.files[0].name}, {position: 1, mediaName: data.files[1].name}]));
 
-        console.log('body', body)
         const response = await api.post('/posts', body);
     } 
 
@@ -57,9 +51,7 @@ export const NewPost = () => {
                 <span className='inline'>New post</span>
             </button>
             <Modal  isOpen={isOpen} title='New post' className="max-w-md" closeModal={handleClose} primaryAction='Save' secondaryAction="Close" onPrimaryAction={() => {
-                // console.log('tste')
                 handleSubmit(handlePost, (a) => console.log(a))();
-                // console.log('caralho')   
             }}>
                 <form  className='flex flex-col gap-4' ref={formRef}>
                     
@@ -72,8 +64,6 @@ export const NewPost = () => {
                                     if (!file) {
                                         return null;
                                     }
-
-                                    console.log('FILE AR', file)
 
                                     const fr = new FileReader();
                                     

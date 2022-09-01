@@ -6,6 +6,7 @@ import { HeartIcon as HeartIconSolid } from "@heroicons/react/solid";
 import { AnnotationIcon, HeartIcon } from "@heroicons/react/outline";
 import { User } from "../../contexts/AuthContext";
 import { Textarea } from "../Textarea";
+import { ImagesCarousel } from "../ImagesCarousel";
 
 interface PostModalProps{
     post?: PostWithMedia & {author: User};
@@ -28,12 +29,14 @@ const btnTextArea =  {
 export function PostModal({post, isPostOpen, closePost}: PostModalProps){
    
     return(
-        <Modal isOpen={isPostOpen} closeModal={closePost} className='p-0 h-modal max-w-7xl'>
+        <Modal isOpen={isPostOpen} closeModal={closePost} className='h-modal max-w-7xl'>
                 {post && 
                 (
                     <div className='w-full h-full  grid grid-cols-2 '>
                         <div className="relative w-full max-w-2xl h-full overflow-hidden">
-                            <Image className='' src={post.medias[0].media_url} layout='fill' objectFit='cover' alt={"Foto de perfil"}/>
+                            {post.medias.length > 1  && <ImagesCarousel images={post.medias.map(m => ({src: m.media_url}))}/>}
+                            {post.medias.length === 1 &&  <Image className='' src={post.medias[0].media_url} layout='fill' objectFit='cover' />}
+                           
                         </div>
                         <div className="w-full flex flex-col  ">
                             <div className='flex flex-col  border-b border-gray-100 '>

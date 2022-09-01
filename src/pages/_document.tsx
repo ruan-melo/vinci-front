@@ -1,4 +1,8 @@
 import { Html, Head, Main, NextScript } from 'next/document'
+import Script from 'next/script'
+
+
+
 
 export default function Document() {
   return (
@@ -12,6 +16,8 @@ export default function Document() {
       <body className='bg-gray-50'>
         <Main  />
         <NextScript />
+        <Script src="https://unpkg.com/flowbite@1.5.2/dist/flowbite.js" defer></Script>
+        {/* <Script src="flow"></Script> */}
       </body>
     </Html>
   )

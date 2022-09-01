@@ -20,7 +20,7 @@ import { decode } from 'jsonwebtoken';
 
 
 export interface ProfileProps {
-    user: (User & {posts: PostWithMedia[]}) | null;
+    user: (User & {posts: PostWithMedia[]} & {followers_count: number, following_count: number}) | null;
     isOwner: boolean;
     follow: boolean;
 }
@@ -28,6 +28,8 @@ export interface ProfileProps {
 export const Profile: NextPage<ProfileProps> = ({ user , isOwner, follow=false}: ProfileProps) => {
 
     // const {user: loggedUser} = useAuth();
+
+    console.log('user', user);
 
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
     const selectedPost = user?.posts.find(post => post.id === selectedPostId);
@@ -82,7 +84,7 @@ export const Profile: NextPage<ProfileProps> = ({ user , isOwner, follow=false}:
                         <Image className='rounded-full w-full h-full bg-gray-300 fill-current' src={user.avatar_url ?? UserAvatar} width={'200px'} height={'200px'} objectFit='cover' alt={"Foto de perfil"}/>
                     </div>
                     
-                    <div className='w-full   flex flex-col gap-2 justify-center ml-4'>
+                    <div className='w-full  flex flex-col gap-2 justify-center ml-4'>
                         <div className='flex justify-between items-center '>
                             <div className=" ">
                                 <h3 className='text-2xl text-gray-800'>{user.name}</h3>
@@ -99,7 +101,7 @@ export const Profile: NextPage<ProfileProps> = ({ user , isOwner, follow=false}:
                         </div>
                        
                         <div>
-                            <p>437 followers</p>
+                            <p>{user.followers_count} {user.followers_count > 1 ? 'followers' : 'follower'}</p>
                         </div>
 
                         <div>
@@ -174,7 +176,6 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async (conte
             }
         }
     } catch(err){
-        console.log('error', err)
 
         return {
             props: {

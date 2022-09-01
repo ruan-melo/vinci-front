@@ -9,6 +9,7 @@ import { Comment } from "./Comment";
 import { Like } from "./Like";
 import { PostWithMedia, PostWithMediaAndAuthor } from "../../../models";
 import UserAvatar from '../../../assets/default-user.svg'
+import { ImagesCarousel } from "../../ImagesCarousel";
 
 export interface PostProps extends PostWithMediaAndAuthor {
     liked: boolean;
@@ -63,8 +64,10 @@ export const Post = ({caption, author, medias, liked: likedProp}: PostProps) => 
 
     return (
         <div className='flex flex-col w-full h-full'>
-            <div className='relative p-0 w-full'>
-                <Image className='' src={medias[0].media_url} alt='post' width='450px' height='550px' objectFit="cover"  />       
+            <div className='relative p-0 w-[450px] h-[550px]'>
+                {medias.length > 1 && <ImagesCarousel images={medias.map(m => ({src: m.media_url}))}/>}
+                {medias.length === 1 && <Image src={medias[0].media_url} layout='fill' objectFit='cover' alt={"Foto de perfil"}/>}
+                {/* <Image className='' src={medias[0].media_url} alt='post' width='450px' height='550px' objectFit="cover"  />        */}
             </div>
 
             <div className='box-border border-none px-4 py-2 bg-opacity-40 flex flex-col gap-2 max-w-full text-gray-700'>

@@ -18,7 +18,6 @@ const Login = () => {
 
     const handleLogIn = async (data: LogInInputs) => {
         await login(data);
-        // console.log('login', data);
     }
 
     return (
