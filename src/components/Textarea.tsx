@@ -14,16 +14,16 @@ type  TextareaProps = React.HTMLProps<HTMLTextAreaElement> & {
 // eslint-disable-next-line react/display-name
 export const Textarea = forwardRef(({label, icon,name, button, placeholder, inputClassName, containerClassName, ...rest}: TextareaProps, ref: ForwardedRef<HTMLTextAreaElement>) => {
     return (
-      <div className={`${containerClassName}`}>
+      <div className='relative' >
         {label && <label className="block text-sm font-medium text-gray-700" htmlFor={name}>{label}</label>}
 
-        <div className={`mt-1 relative rounded-md ${containerClassName}`}>
-          {icon && <div className="absolute inset-y-0 left-0 flex items-center pl-3 ">{icon}</div>}
+        <div className={`h-full relative rounded-md ${containerClassName ? containerClassName: ''}`}>
+          {icon && <div className="absolute h-full inset-y-0 left-0 flex items-center pl-3 ">{icon}</div>}
          
           <textarea
             name={name}
             id={name}
-            className={`ring-0 border-0 outline-none focus:outline-none focus:ring-gray-400  block w-full px-12 sm:text-sm rounded-md ${inputClassName}`}
+            className={`textarea  sm:text-sm rounded-md ${inputClassName}`}
             placeholder={placeholder}
             {...rest}
             ref={ref}

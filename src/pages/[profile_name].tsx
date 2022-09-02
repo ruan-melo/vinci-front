@@ -29,8 +29,6 @@ export const Profile: NextPage<ProfileProps> = ({ user , isOwner, follow=false}:
 
     // const {user: loggedUser} = useAuth();
 
-    console.log('user', user);
-
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
     const selectedPost = user?.posts.find(post => post.id === selectedPostId);
 
@@ -92,12 +90,12 @@ export const Profile: NextPage<ProfileProps> = ({ user , isOwner, follow=false}:
                             </div>
                             
                             {isOwner && (
-                                <Button variant='outline' className='text-gray-500 hover:text-gray-800'>
+                                <Button variant='outline' >
                                     <CogIcon className='h-6 w-6'/>
                                 </Button>
                             )}
                             {!isOwner && !isFollowing && <Button onClick={handleFollow} className='mt-0'>Follow</Button> }
-                            {!isOwner && isFollowing && <Button onClick={handleUnfollow} variant='outline' className='mt-0 text-gray-500 hover:text-gray-800'>Unfollow</Button> }
+                            {!isOwner && isFollowing && <Button onClick={handleUnfollow} variant='outline' className='mt-0'>Unfollow</Button> }
                         </div>
                        
                         <div>
@@ -129,8 +127,9 @@ export const Profile: NextPage<ProfileProps> = ({ user , isOwner, follow=false}:
                 )}
                 
             </div>
-
-            <PostModal isPostOpen={isPostOpen} closePost={closePost} post={selectedPost ? {...selectedPost, author: user} : undefined}/>
+            
+            {selectedPost && <PostModal isPostOpen={isPostOpen} closePost={closePost} post={{...selectedPost, author: user}}/>}
+            
             
         </Main>  
     )

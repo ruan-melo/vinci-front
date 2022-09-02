@@ -11,11 +11,13 @@ interface DropzoneProps extends React.HTMLAttributes<HTMLDivElement> {
 // eslint-disable-next-line react/display-name
 export const Dropzone = forwardRef(({id, labelClassName, ...rest}: DropzoneProps, ref: ForwardedRef<HTMLInputElement>) => {
     return(
-        <div className='flex items-stretch  w-full'>
+        <div className='flex items-stretch h-full w-full'>
             <label 
                 htmlFor={id} 
                 className={`
                     flex flex-col p-4 gap-2 items-center justify-center w-full border-2 border-dashed bg-gray-100 border-gray-300 rounded-md
+                    hover:bg-gray-200 transition-all duration-300
+                    hover:border-green-300
                     ${labelClassName}
                 `}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -25,7 +27,7 @@ export const Dropzone = forwardRef(({id, labelClassName, ...rest}: DropzoneProps
                 <p className='text-md'>Click to upload or drag and drop</p>
                 <p className='text-sm'>JPG, JPEG, BMP or PNG</p>
 
-                <input multiple type="file" id={id}  className="hidden" onChange={(e) => console.log('input mudou ', e.target.value) }  {...rest} ref={ref}/>
+                <input multiple type="file" id={id}  className="hidden"  {...rest} ref={ref}/>
             </label>
         </div>
     )
