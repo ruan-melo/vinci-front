@@ -1,8 +1,10 @@
 import '../styles/globals.css'
+import 'react-toastify/dist/ReactToastify.css'
 // import 'flowbite';
 import type { AppProps } from 'next/app'
 import { AuthContextProvider } from '../contexts/AuthContext'
 import { RouteGuard } from '../components/RouteGuard'
+import { ToastContainer, toast } from 'react-toastify'
 
 // if (typeof window !== "undefined") {
 //   import('flowbite');
@@ -10,8 +12,9 @@ import { RouteGuard } from '../components/RouteGuard'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <AuthContextProvider> 
+    <AuthContextProvider>
       <Component {...pageProps} />
+      <ToastContainer />
     </AuthContextProvider>
   )
 }

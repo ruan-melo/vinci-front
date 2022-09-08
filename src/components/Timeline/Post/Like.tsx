@@ -12,7 +12,7 @@ export const Like = ({user}: LikeProps) => {
     return(
         <div className='flex gap-2 items-center'>
             <div>
-                <Avatar className="" avatar_url={user.avatar_url} name={user.name}/>
+                <Avatar className="h-8 w-8" avatar_url={user.avatar_url} name={user.name}/>
             </div>
             
             <div className='flex flex-col gap-2 text-sm sm:text-md'>
