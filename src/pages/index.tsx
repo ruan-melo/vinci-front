@@ -1,3 +1,4 @@
+import { onMessage } from 'firebase/messaging'
 import { GetServerSideProps, NextPage } from 'next'
 import { parseCookies } from 'nookies'
 import { useEffect } from 'react'
@@ -9,6 +10,7 @@ import { useAuth } from '../hooks/useAuth'
 import { Main } from '../layouts/Main'
 import { PostTimeline, PostWithMedia, PostWithMediaAndAuthor } from '../models'
 import { fetcher } from '../services/api'
+import { getFirebaseMessaging, requestPermission } from '../services/firebase'
 import { getApiClient } from '../services/getApiClient'
 
 interface HomeProps {
@@ -22,6 +24,23 @@ const TIMELINE_KEY = '/posts/timeline'
 const Home = () => {
   const { data } = useSWR<Array<PostTimeline>>('/posts/timeline', fetcher)
 
+  useEffect(() => {
+    async function getToken() {
+      const teste = await requestPermission()
+      const messaging = getFirebaseMessaging()
+
+      if (!messaging) return
+      onMessage(messaging, (payload) => {
+        console.log('Message received. ', payload)
+        // ...
+      })
+      console.log('initialize on message', messaging)
+    }
+
+    if (window !== undefined) {
+      getToken()
+    }
+  }, [])
   return (
     <Main>
       <Timeline posts={data ?? []} />
