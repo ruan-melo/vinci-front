@@ -1,110 +1,126 @@
-import { createContext, useEffect, useState } from "react";
-import { destroyCookie, parseCookies, setCookie } from "nookies"
+import { createContext, ReactNode, useEffect, useState } from 'react'
+import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import Router from 'next/router'
-import { api } from "../services/api";
+import { api } from '../services/api'
+import { gql, useQuery } from '@apollo/client'
+import { client } from '../services/apolloClient'
 
-export interface User {
-    id: string;
-    name: string;
-    email: string;
-    profile_name: string;
-    avatar_url: string | null;
-    created_at: string;
-    updated_at: string;
+export interface Profile {
+  id: string
+  name: string
+  email: string
+  profile_name: string
+  avatar: string | null
+  createdAt: string
+  updatedAt: string
 }
-
 interface AccessResponse {
-    access_token: string;
-    user: User;
+  access_token: string
+  user: Profile
 }
 
 interface LoginData {
-    email: string;
-    password: string;
+  email: string
+  password: string
 }
 
 interface SignUpData {
-    name: string;
-    email: string;
-    password: string;
-    profile_name: string;
+  name: string
+  email: string
+  password: string
+  profile_name: string
 }
 
 interface AuthContextData {
-    user: User | null;
-    login: (data: LoginData) => Promise<void>; 
-    signUp: (data: SignUpData) => Promise<void>;
-    logout: () => void;
-    isAuthenticated: boolean;
+  user: Profile | null
+  login: (data: LoginData) => Promise<void>
+  signUp: (data: SignUpData) => Promise<void>
+  logout: () => void
+  isAuthenticated: boolean
 }
 
-export const AuthContext = createContext({} as AuthContextData);
+export const AuthContext = createContext({} as AuthContextData)
 
-interface AuthContextProviderProps{
-    children: React.ReactNode;
+interface AuthContextProviderProps {
+  children: ReactNode
 }
 
-export const AuthContextProvider = ({children}: AuthContextProviderProps) => {
-    const [user, setUser] = useState<User | null>(null);
-    const isAuthenticated = !!user;
-
-    const getUserProfile = async (access_token: string) => {
-        const { data } = await api.get<User>('/users/profile');
-
-        return data
+export const GET_LOGGED_USER_INFO = gql`
+  query GetLoggedUserInfo {
+    profile {
+      id
+      name
+      email
+      profile_name
+      avatar
+      createdAt
+      updatedAt
     }
+  }
+`
 
+export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
+  const [user, setUser] = useState<Profile | null>(null)
+  //   const { 'vinci:access_token': access_token } = parseCookies()
+  const { error, loading, data } = useQuery<{ profile: Profile }>(
+    GET_LOGGED_USER_INFO,
+  )
+  const isAuthenticated = !!user
 
-    useEffect(() => {
-        const {'vinci:access_token': access_token } = parseCookies();
+  //   const getUserProfile = async (access_token: string) => {
+  //     const { data } = await api.get<User>('/users/profile')
 
-        const loadUser = async () => {
-            if (access_token) {
-                const user = await getUserProfile(access_token);
+  //     return data
+  //   }
 
-                setUser(u => user);
-            }
-        }
-
-        loadUser();
-    }, [])
-
-    const logout = () => {
-        setUser(null);
-        destroyCookie(null, 'vinci:access_token');
-        Router.push('/');
+  useEffect(() => {
+    if (data) {
+      setUser(data.profile)
     }
+  }, [data])
 
-    async function login(credentials: {email: string, password: string}) {
-        const { data  } = await api.post<AccessResponse>('/auth/login', credentials);
+  const logout = () => {
+    setUser(null)
+    destroyCookie(null, 'vinci:access_token')
+    Router.push('/')
+  }
 
-        const { access_token, user } = data;
-        setUser(user);
-        // Como está do lado do client não é necessário passar o ctx para a função (passa null no lugar)
-        // Como diversas aplicações em desenvolvimento utilizando o localhost, é recomendado utilizar um prefixo para o cookie
-        setCookie(null, "vinci:access_token", access_token, {
-            maxAge: 7 * 24 * 60 * 60, // 7 days
-        })
+  async function login(credentials: { email: string; password: string }) {
+    const { data } = await api.post<AccessResponse>('/auth/login', credentials)
 
-        api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-        Router.push('/');
-    }
+    const { access_token, user } = data
+    setUser(user)
+    // Como está do lado do client não é necessário passar o ctx para a função (passa null no lugar)
+    // Como diversas aplicações em desenvolvimento utilizando o localhost, é recomendado utilizar um prefixo para o cookie
+    setCookie(null, 'vinci:access_token', access_token, {
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    })
 
-    async function signUp(credentials: {name: string, email: string, password: string}) {
-        const { data } = await api.post<AccessResponse>('/auth/signup', credentials);
+    api.defaults.headers.common.Authorization = `Bearer ${access_token}`
+    Router.push('/')
+  }
 
-        const { access_token, user } = data;
-        setUser(user);
-        setCookie(null, "vinci:access_token", access_token, {
-            maxAge: 7 * 24 * 60 * 60, // 7 days
-        })
+  async function signUp(credentials: {
+    name: string
+    email: string
+    password: string
+  }) {
+    const { data } = await api.post<AccessResponse>('/auth/signup', credentials)
 
-        api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-        Router.push('/');
-    }
-    return (
-        <AuthContext.Provider value={{user, login, isAuthenticated, logout, signUp}}>
-            {children}
-        </AuthContext.Provider>
-    )
+    const { access_token, user } = data
+    setUser(user)
+    setCookie(null, 'vinci:access_token', access_token, {
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    })
+
+    api.defaults.headers.common.Authorization = `Bearer ${access_token}`
+    Router.push('/')
+  }
+  return (
+    <AuthContext.Provider
+      value={{ user, login, isAuthenticated, logout, signUp }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
 }

@@ -1,58 +1,82 @@
-import { onMessage } from 'firebase/messaging'
+import { gql, useQuery } from '@apollo/client'
 import { GetServerSideProps, NextPage } from 'next'
 import { parseCookies } from 'nookies'
 import { useEffect } from 'react'
-import useSWR, { SWRConfig } from 'swr'
 // import { ImagesC } from "../components/ImagesCarousel"
-import { Header } from '../components/Header'
 import { Timeline } from '../components/Timeline'
-import { useAuth } from '../hooks/useAuth'
 import { Main } from '../layouts/Main'
-import { PostTimeline, PostWithMedia, PostWithMediaAndAuthor } from '../models'
-import { fetcher } from '../services/api'
-import { getFirebaseMessaging, requestPermission } from '../services/firebase'
-import { getApiClient } from '../services/getApiClient'
+import { TimelinePost } from '../models'
+import { getApolloClient } from '../services/getApolloClient'
 
 interface HomeProps {
-  fallback: {
-    '/posts/timeline': Array<PostTimeline>
-  }
+  timeline: TimelinePost[]
 }
 
 const TIMELINE_KEY = '/posts/timeline'
 
-const Home = () => {
-  const { data } = useSWR<Array<PostTimeline>>('/posts/timeline', fetcher)
+const GET_TIMELINE = gql`
+  query GetTimeline {
+    timeline {
+      id
+      caption
+      commentsCount
+      likesCount
+      liked
+      medias {
+        id
+        media_url
+        position
+      }
 
-  useEffect(() => {
-    async function getToken() {
-      const teste = await requestPermission()
-      const messaging = getFirebaseMessaging()
-
-      if (!messaging) return
-      onMessage(messaging, (payload) => {
-        console.log('Message received. ', payload)
-        // ...
-      })
-      console.log('initialize on message', messaging)
+      author {
+        avatar
+        name
+        profile_name
+      }
     }
+  }
+`
 
-    if (window !== undefined) {
-      getToken()
-    }
-  }, [])
+const Home = ({ timeline }: HomeProps) => {
+  // !! USE CACHE
+  // const { data, error, loading } = useQuery<{ timeline: TimelinePost[] }>(
+  //   GET_TIMELINE,
+  //   {
+  //     ssr: false,
+
+  //   }
+
+  // )
+
+  // console.log('timeline data', data)
+
+  // useEffect(() => {
+  //   // async function getToken() {
+  //   //   const teste = await requestPermission()
+  //   //   const messaging = getFirebaseMessaging()
+  //   //   if (!messaging) return
+  //   //   onMessage(messaging, (payload) => {
+  //   //     console.log('Message received. ', payload)
+  //   //     // ...
+  //   //   })
+  //   //   console.log('initialize on message', messaging)
+  //   // }
+  //   // if (window !== undefined) {
+  //   //   getToken()
+  //   // }
+  // }, [])
   return (
     <Main>
-      <Timeline posts={data ?? []} />
+      <Timeline posts={timeline ?? []} />
     </Main>
   )
 }
 
-const Page: NextPage<HomeProps> = ({ fallback }: HomeProps) => {
+const Page: NextPage<HomeProps> = ({ timeline }: HomeProps) => {
   return (
-    <SWRConfig value={{ fallback }}>
-      <Home />
-    </SWRConfig>
+    // <SWRConfig value={{ fallback }}>
+    <Home timeline={timeline} />
+    // </SWRConfig>
   )
 }
 
@@ -72,20 +96,22 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
     }
   }
 
-  const api = getApiClient(context)
+  const client = getApolloClient(context)
 
   try {
-    const response = await api.get<Array<PostTimeline>>('/posts/timeline')
+    const { data, error, loading } = await client.query<{
+      timeline: TimelinePost[]
+    }>({
+      query: GET_TIMELINE,
+    })
 
-    if (!response.data) {
+    if (error) {
       throw new Error('error')
     }
 
     return {
       props: {
-        fallback: {
-          [TIMELINE_KEY]: response.data,
-        },
+        timeline: data.timeline,
       },
     }
   } catch (err) {
@@ -94,9 +120,7 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
 
   return {
     props: {
-      fallback: {
-        [TIMELINE_KEY]: [],
-      },
+      timeline: [],
     },
   }
 }

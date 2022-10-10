@@ -1,21 +1,24 @@
 import { TrashIcon } from '@heroicons/react/solid'
-import Image from 'next/image'
+
 import { useAuth } from '../../../hooks/useAuth'
-import { Comment as CommentType, CommentWithAuthor } from '../../../models'
+
 import { Avatar } from '../../Avatar'
 
-type CommentProps = CommentWithAuthor & {
-  handleRemove?: () => void
+type CommentProps = {
+  text: string
+  author: { id: string; profile_name: string; avatar: string; name: string }
+} & {
+  handleDelete?: () => void
 }
 
-export const Comment = ({ text, author, handleRemove }: CommentProps) => {
+export const Comment = ({ text, author, handleDelete }: CommentProps) => {
   const { user } = useAuth()
   return (
     <div className="flex gap-2">
       <div>
         <Avatar
           name={author.name}
-          avatar_url={author.avatar_url}
+          avatar={author.avatar}
           className="h-10 w-10"
         />
       </div>
@@ -29,7 +32,7 @@ export const Comment = ({ text, author, handleRemove }: CommentProps) => {
 
       {user?.id === author.id && (
         <div
-          onClick={handleRemove}
+          onClick={handleDelete}
           className="cursor-pointer h-fit text-gray-600 hover:text-gray-800 transition-all duration-300"
         >
           <TrashIcon className="h-4 w-4 text-inherit" />

@@ -5,6 +5,8 @@ import type { AppProps } from 'next/app'
 import { AuthContextProvider } from '../contexts/AuthContext'
 import { RouteGuard } from '../components/RouteGuard'
 import { ToastContainer, toast } from 'react-toastify'
+import { ApolloProvider } from '@apollo/client'
+import { client } from '../services/apolloClient'
 
 // if (typeof window !== "undefined") {
 //   import('flowbite');
@@ -12,10 +14,12 @@ import { ToastContainer, toast } from 'react-toastify'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <AuthContextProvider>
-      <Component {...pageProps} />
-      <ToastContainer />
-    </AuthContextProvider>
+    <ApolloProvider client={client}>
+      <AuthContextProvider>
+        <Component {...pageProps} />
+        <ToastContainer />
+      </AuthContextProvider>
+    </ApolloProvider>
   )
 }
 

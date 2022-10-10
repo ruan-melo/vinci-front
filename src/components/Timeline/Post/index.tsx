@@ -1,37 +1,20 @@
-import { AnnotationIcon, HeartIcon } from '@heroicons/react/outline'
-import {
-  AnnotationIcon as AnnotationIconSolid,
-  HeartIcon as HeartIconSolid,
-} from '@heroicons/react/solid'
+import { AnnotationIcon } from '@heroicons/react/outline'
 import Image from 'next/image'
-import {
-  createRef,
-  FormEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
-import { Modal } from '../../Modal'
+import { FormEvent, useState } from 'react'
 import { Textarea } from '../../Textarea'
 import { useDisclosure } from '@chakra-ui/hooks'
-import { Comment } from './Comment'
-import { Like } from './Like'
-import {
-  PostTimeline,
-  PostWithMedia,
-  PostWithMediaAndAuthor,
-} from '../../../models'
+import { TimelinePost } from '../../../models'
 import UserAvatar from '../../../assets/default-user.svg'
 import { ImagesCarousel } from '../../ImagesCarousel'
-import { api, fetcher } from '../../../services/api'
-import useSWR from 'swr'
+import { api } from '../../../services/api'
 import { ModalComments } from '../ModalComments'
 import { ModalLikes } from '../../ModalLikes'
 import { PostOptions } from './PostOptions'
 import { LikeHeart } from '../../LikeHeart'
+import { client } from '../../../services/apolloClient'
+import { gql } from '@apollo/client'
 
-export interface PostProps extends PostTimeline {}
+export interface PostProps extends TimelinePost {}
 
 const btnTextArea = {
   label: 'Send',
@@ -51,9 +34,10 @@ export const Post = ({
   author,
   medias,
   id,
-  comments_count: commentsCountProps,
   liked: likedProp,
-  likes_count: likesCountProps,
+  commentsCount: commentsCountProps,
+  // liked: likedProp,
+  likesCount: likesCountProps,
 }: PostProps) => {
   const {
     isOpen: isModalCommentsOpen,
@@ -71,8 +55,20 @@ export const Post = ({
   const [commentsCount, setCommentsCount] = useState(commentsCountProps)
 
   const handleLike = async () => {
+    const LIKE_POST = gql`
+      mutation ($postId: String!) {
+        likePost(postId: $postId) {
+          id
+        }
+      }
+    `
     try {
-      const response = await api.post(`/posts/${id}/likes`)
+      const response = await client.mutate({
+        mutation: LIKE_POST,
+        variables: {
+          postId: id,
+        },
+      })
       setLikesCount((oldState) => oldState + 1)
       setLiked(true)
     } catch (err) {
@@ -82,18 +78,22 @@ export const Post = ({
 
   const handleRemoveLike = async () => {
     try {
-      const response = await api.delete(`/posts/${id}/likes`)
+      const REMOVE_LIKE = gql`
+        mutation ($postId: String!) {
+          unlikePost(postId: $postId) {
+            id
+          }
+        }
+      `
+
+      const response = await client.mutate({
+        mutation: REMOVE_LIKE,
+        variables: {
+          postId: id,
+        },
+      })
       setLikesCount((oldState) => oldState - 1)
       setLiked(false)
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-  const handleRemoveComment = async () => {
-    try {
-      const response = await api.delete(`/posts/${id}/comments`)
-      setCommentsCount((oldState) => oldState - 1)
     } catch (err) {
       console.log(err)
     }
@@ -107,7 +107,28 @@ export const Post = ({
     if (text.length === 0) return
 
     try {
-      await api.post(`/posts/${id}/comments`, { text })
+      const CREATE_COMMENT = gql`
+        mutation CreateComment($postId: String!, $text: String!) {
+          comment(postId: $postId, text: $text) {
+            id
+            caption
+            author {
+              id
+              name
+              avatar
+              profile_name
+            }
+          }
+        }
+      `
+
+      const response = await client.mutate({
+        mutation: CREATE_COMMENT,
+        variables: {
+          postId: id,
+          text,
+        },
+      })
       setCommentsCount((oldState) => oldState + 1)
       textElement.value = ''
     } catch (e) {
@@ -138,7 +159,7 @@ export const Post = ({
           <div className="w-10 h-10 rounded-full overflow-hidden">
             <Image
               className="bg-gray-300 fill-current"
-              src={author.avatar_url ?? UserAvatar}
+              src={author.avatar ?? UserAvatar}
               width={'50px'}
               height={'50px'}
               objectFit="cover"
@@ -197,6 +218,9 @@ export const Post = ({
           postId={id}
           isOpen={isModalCommentsOpen}
           closeModal={onCloseModalComments}
+          onDeleteComment={() => {
+            setCommentsCount((oldState) => oldState - 1)
+          }}
         />
       </div>
 

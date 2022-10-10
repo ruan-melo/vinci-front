@@ -6,9 +6,8 @@ import { parseCookies } from 'nookies'
 import { useState } from 'react'
 import { Button } from '../components/Button'
 import { PostImage } from '../components/Timeline/PostImage'
-import { User } from '../contexts/AuthContext'
 import { Main } from '../layouts/Main'
-import { PostWithMedia } from '../models'
+
 import { getApiClient } from '../services/getApiClient'
 import { PostModal } from '../components/PostModal'
 import { CogIcon, PhotographIcon } from '@heroicons/react/solid'
@@ -17,29 +16,43 @@ import { api } from '../services/api'
 import Router, { useRouter } from 'next/router'
 import { useAuth } from '../hooks/useAuth'
 import { decode } from 'jsonwebtoken'
+import { client } from '../services/apolloClient'
+import { gql } from '@apollo/client'
+interface UserProfile {
+  id: string
+  name: string
+  profile_name: string
+  avatar: string
+  followersCount: number
+  followsCount: number
+  followed: boolean
+  posts: {
+    caption: string
+    id: string
+    medias: {
+      id: string
+      media_url: string
+      position: number
+    }[]
+  }[]
+}
 
-export interface ProfileProps {
-  user:
-    | (User & { posts: PostWithMedia[] } & {
-        followers_count: number
-        following_count: number
-      })
-    | null
+export type ProfileProps = UserProfile & {
   isOwner: boolean
-  follow: boolean
 }
 
 export const Profile: NextPage<ProfileProps> = ({
-  user,
+  posts,
+  followed,
   isOwner,
-  follow = false,
+  ...user
 }: ProfileProps) => {
   // const {user: loggedUser} = useAuth();
 
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
-  const selectedPost = user?.posts.find((post) => post.id === selectedPostId)
+  const selectedPost = posts.find((post) => post.id === selectedPostId)
 
-  const [isFollowing, setIsFollowing] = useState(follow)
+  const [isFollowing, setIsFollowing] = useState(followed)
   const {
     isOpen: isPostOpen,
     onOpen: openPost,
@@ -68,6 +81,11 @@ export const Profile: NextPage<ProfileProps> = ({
 
   const handleFollow = async () => {
     try {
+      const FOLLOW_USER = gql`
+        mutation ($profile_name: String!) {
+          follow(profile_name: $profile_name)
+        }
+      `
       const response = await api.post(`/users/${user?.profile_name}/follow`)
       setIsFollowing(true)
     } catch {
@@ -109,7 +127,7 @@ export const Profile: NextPage<ProfileProps> = ({
           <div className="shrink-0 h-48 w-48  relative  text-white bg-white fill-current ">
             <Image
               className="rounded-full w-full h-full bg-gray-300 fill-current"
-              src={user.avatar_url ?? UserAvatar}
+              src={user.avatar ?? UserAvatar}
               width={'200px'}
               height={'200px'}
               objectFit="cover"
@@ -147,8 +165,8 @@ export const Profile: NextPage<ProfileProps> = ({
 
             <div>
               <p>
-                {user.followers_count}{' '}
-                {user.followers_count > 1 ? 'followers' : 'follower'}
+                {user.followsCount}{' '}
+                {user.followersCount > 1 ? 'followers' : 'follower'}
               </p>
             </div>
 
@@ -158,16 +176,16 @@ export const Profile: NextPage<ProfileProps> = ({
           </div>
         </div>
 
-        {user.posts.length <= 0 && (
+        {posts.length <= 0 && (
           <div className="flex items-center justify-center mt-4 flex-col text-gray-400">
             <PhotographIcon className="h-8 w-8 " />
             <p className="">No posts</p>
           </div>
         )}
 
-        {user.posts.length > 0 && (
+        {posts.length > 0 && (
           <div className="grid grid-cols-3  justify-between gap-2 mt-4">
-            {user.posts.map((post) => {
+            {posts.map((post) => {
               return (
                 <PostImage key={post.id} post={post} onClick={handleOpenPost} />
               )
@@ -189,6 +207,29 @@ export const Profile: NextPage<ProfileProps> = ({
 
 export default Profile
 
+const GET_USER_PROFILE = gql`
+  query GetUserProfile($profile_name: String!) {
+    profile(profile_name: $profile_name) {
+      id
+      avatar
+      name
+      profile_name
+      posts {
+        author
+        caption
+        medias {
+          id
+          media_url
+          position
+        }
+      }
+      followsCount
+      followersCount
+      followed
+    }
+  }
+`
+
 export const getServerSideProps: GetServerSideProps<ProfileProps> = async (
   context,
 ) => {
@@ -202,43 +243,29 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async (
     : null
 
   try {
-    const { data } = await api.get<ProfileProps['user'] & { follow: boolean }>(
-      `/users/${profile_name}`,
-      {
-        params: {
-          posts: true,
-        },
-      },
-    )
+    const { data, error } = await client.query<{ profile: UserProfile }>({
+      query: GET_USER_PROFILE,
+      variables: { profile_name },
+    })
 
-    if (!data) {
+    if (error) {
       return {
-        props: {
-          user: null,
-          isOwner: false,
-          follow: false,
-        },
+        notFound: true,
       }
     }
-
-    const { follow, ...user } = data
+    const { followed, ...user } = data.profile
 
     const isOwner = decoded ? decoded.sub === user.id : false
 
     return {
       props: {
-        user,
+        ...data.profile,
         isOwner,
-        follow,
       },
     }
   } catch (err) {
     return {
-      props: {
-        user: null,
-        isOwner: false,
-        follow: false,
-      },
+      notFound: true,
     }
   }
 }
