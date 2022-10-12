@@ -5,6 +5,7 @@ import { Logo } from '../components/Logo'
 import { useAuth } from '../hooks/useAuth'
 import { Access } from '../layouts/Access'
 import { useForm } from 'react-hook-form'
+import axios, { Axios } from 'axios'
 
 interface LogInInputs {
   email: string
@@ -20,7 +21,13 @@ const Login = () => {
   } = useForm<LogInInputs>()
 
   const handleLogIn = async (data: LogInInputs) => {
-    await login(data)
+    try {
+      await login(data)
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        // alert(JSON.stringify(e.))
+      }
+    }
   }
 
   return (

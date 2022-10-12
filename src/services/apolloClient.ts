@@ -3,7 +3,7 @@ import { setContext } from '@apollo/client/link/context'
 import { parseCookies } from 'nookies'
 
 const httpLink = createHttpLink({
-  uri: 'http://localhost:3000/graphql',
+  uri: 'http://192.168.0.108:3000/graphql',
 })
 
 const authLink = setContext((_, { headers }) => {
@@ -21,4 +21,5 @@ const authLink = setContext((_, { headers }) => {
 export const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
+  connectToDevTools: true,
 })

@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
+import { toast } from 'react-toastify'
 import { Button } from '../../components/Button'
 import { Dropzone } from '../../components/Dropzone'
 import { useImageLoader } from '../../hooks/useImageLoader'
@@ -49,13 +50,21 @@ export const EditAvatar = () => {
           onChange={(files) => {
             setAvatar(files[0])
           }}
+          // ! MELHORAR MENSAGEM DE ERRO, NEM SEMPRE VAI SER FORMATO DE ARQUIVO INVÁLIDO
+          onDropRejected={(files) => {
+            toast(
+              `Formato de arquivos inválidos: ${files
+                .map((f) => f.file.name)
+                .join(', ')}`,
+            )
+          }}
           options={{
             maxFiles: 1,
-            accept: {
-              'image/png': ['.png'],
-              'image/bmp': ['.bmp'],
-              'image/jpeg': ['.jpeg', '.jpg'],
-            },
+          }}
+          accept={{
+            'image/png': ['.png'],
+            'image/bmp': ['.bmp'],
+            'image/jpeg': ['.jpeg', '.jpg'],
           }}
         />
       )}

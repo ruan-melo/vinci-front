@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { GetServerSideProps, NextPage } from 'next'
 import { parseCookies } from 'nookies'
 import { useEffect } from 'react'
@@ -7,6 +7,7 @@ import { Timeline } from '../components/Timeline'
 import { Main } from '../layouts/Main'
 import { TimelinePost } from '../models'
 import { getApolloClient } from '../services/getApolloClient'
+import { GET_TIMELINE } from '../services/queries'
 
 interface HomeProps {
   timeline: TimelinePost[]
@@ -14,37 +15,10 @@ interface HomeProps {
 
 const TIMELINE_KEY = '/posts/timeline'
 
-const GET_TIMELINE = gql`
-  query GetTimeline {
-    timeline {
-      id
-      caption
-      commentsCount
-      likesCount
-      liked
-      medias {
-        id
-        media_url
-        position
-      }
-
-      author {
-        avatar
-        name
-        profile_name
-      }
-    }
-  }
-`
-
-const Home = ({ timeline }: HomeProps) => {
-  // !! USE CACHE
-  // const { data, error, loading } = useQuery<{ timeline: TimelinePost[] }>(
-  //   GET_TIMELINE,
-  //   {
-  //     ssr: false,
-
-  //   }
+const Home = () => {
+  const { data, error, loading } = useQuery<{ timeline: TimelinePost[] }>(
+    GET_TIMELINE,
+  )
 
   // )
 
@@ -65,26 +39,27 @@ const Home = ({ timeline }: HomeProps) => {
   //   //   getToken()
   //   // }
   // }, [])
+
+  if (loading) return <div>loading...</div>
+
   return (
     <Main>
-      <Timeline posts={timeline ?? []} />
+      <Timeline posts={data?.timeline ?? []} />
     </Main>
   )
 }
 
-const Page: NextPage<HomeProps> = ({ timeline }: HomeProps) => {
+const Page: NextPage<HomeProps> = () => {
   return (
     // <SWRConfig value={{ fallback }}>
-    <Home timeline={timeline} />
+    <Home />
     // </SWRConfig>
   )
 }
 
 export default Page
 
-export const getServerSideProps: GetServerSideProps<HomeProps> = async (
-  context,
-) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const { 'vinci:access_token': access_token } = parseCookies(context)
 
   if (!access_token) {
@@ -96,31 +71,35 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
     }
   }
 
-  const client = getApolloClient(context)
-
-  try {
-    const { data, error, loading } = await client.query<{
-      timeline: TimelinePost[]
-    }>({
-      query: GET_TIMELINE,
-    })
-
-    if (error) {
-      throw new Error('error')
-    }
-
-    return {
-      props: {
-        timeline: data.timeline,
-      },
-    }
-  } catch (err) {
-    console.log('error', err)
-  }
+  // const client = getApolloClient(context)
 
   return {
-    props: {
-      timeline: [],
-    },
+    props: {},
   }
+
+  // try {
+  //   const { data, error, loading } = await client.query<{
+  //     timeline: TimelinePost[]
+  //   }>({
+  //     query: GET_TIMELINE,
+  //   })
+
+  //   if (error) {
+  //     throw new Error('error')
+  //   }
+
+  //   return {
+  //     props: {
+  //       timeline: data.timeline,
+  //     },
+  //   }
+  // } catch (err) {
+  //   console.log('error', err)
+  // }
+
+  // return {
+  //   props: {
+  //     timeline: [],
+  //   },
+  // }
 }

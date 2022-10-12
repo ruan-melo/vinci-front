@@ -1,8 +1,10 @@
 import Image from 'next/image'
-import { PostWithMedia } from '../../../models'
 
 interface PostImageProps {
-  post: PostWithMedia
+  post: {
+    id: string
+    medias: { media_url: string }[]
+  }
   onClick: (id: string) => void
 }
 

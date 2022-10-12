@@ -3,9 +3,8 @@ import { HeartIcon as HeartIconSolid } from '@heroicons/react/solid'
 import { AnnotationIcon, HeartIcon } from '@heroicons/react/outline'
 import { Textarea } from '../Textarea'
 import Image from 'next/image'
-import { User } from '../../contexts/AuthContext'
-import { PostWithMedia, Comment as CommentType } from '../../models'
-import post from '../../pages/post/[...postId]'
+
+import post from '../../pages/post/[postId]'
 import { ImagesCarousel } from '../ImagesCarousel'
 import { ModalLikes } from '../ModalLikes'
 import UserAvatar from '../../assets/default-user.svg'
@@ -13,17 +12,36 @@ import { Comment } from '../Timeline/Post/Comment'
 import { Avatar } from '../Avatar'
 import { PostOptions } from '../Timeline/Post/PostOptions'
 import { FormEvent, useState } from 'react'
-import { api } from '../../services/api'
 import { useAuth } from '../../hooks/useAuth'
 import { LikeHeart } from '../LikeHeart'
+import { Post as PostModel } from '../../models/post'
 import Router from 'next/router'
+import { Media as MediaModel } from '../../models/media'
+import { CommentModel } from '../../models/comment'
+import { User as UserModel } from '../../models/user'
+import { client } from '../../services/apolloClient'
+import {
+  CREATE_COMMENT,
+  LIKE_POST,
+  REMOVE_LIKE,
+  DELETE_COMMENT,
+} from '../../services/queries'
+import { CommentResponse } from '../PostModal'
 
-export interface PostProps extends PostWithMedia {
-  author: User
+export interface PostProps extends Required<Pick<PostModel, 'id' | 'caption'>> {
+  author: Required<Pick<UserModel, 'avatar' | 'id' | 'profile_name' | 'name'>>
   liked: boolean
-  likes_count: number
-  comments_count: number
-  comments: (CommentType & { author: User })[]
+  likesCount: number
+  commentsCount: number
+  medias: Required<MediaModel>[]
+  comments: (Required<CommentModel> & {
+    author: Required<Pick<UserModel, 'avatar' | 'id' | 'name' | 'profile_name'>>
+  })[]
+
+  onLike?: () => void
+  onRemoveLike?: () => void
+  onCreateComment?: (comment: CommentResponse) => void
+  onDeleteComment?: (commentId: string) => void
 }
 
 const btnTextArea = {
@@ -42,12 +60,16 @@ const btnTextArea = {
 export const Post = ({
   medias,
   id,
-  comments: commentsProp,
+  comments,
   caption,
-  comments_count: commentsCountProps,
-  liked: likedProp,
-  likes_count: likesCountProps,
+  commentsCount,
+  liked,
+  likesCount,
   author,
+  onLike,
+  onRemoveLike,
+  onCreateComment,
+  onDeleteComment,
 }: PostProps) => {
   const {
     isOpen: isModalLikesOpen,
@@ -55,12 +77,7 @@ export const Post = ({
     onOpen: openModalLikes,
   } = useDisclosure()
 
-  console.log('likedProp', likedProp)
   const { user } = useAuth()
-  const [comments, setComments] = useState(commentsProp)
-  const [liked, setLiked] = useState(likedProp)
-  const [likesCount, setLikesCount] = useState(likesCountProps)
-  const [commentsCount, setCommentsCount] = useState(commentsCountProps)
 
   const handleCreateComment = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -70,14 +87,18 @@ export const Post = ({
     if (text.length === 0) return
 
     try {
-      const response = await api.post<CommentType>(`/posts/${id}/comments`, {
-        text,
+      const response = await client.mutate<{ comment: CommentResponse }>({
+        mutation: CREATE_COMMENT,
+        variables: {
+          postId: id,
+          text,
+        },
       })
-      setComments((oldState) => [
-        ...oldState,
-        { ...response.data, author: user as User },
-      ])
-      setCommentsCount((oldState) => oldState + 1)
+
+      // !! NOTIFY ERROR
+      if (!response.data) return
+
+      onCreateComment && onCreateComment(response.data?.comment)
       textElement.value = ''
     } catch (e) {
       // TODO: Tratar erro
@@ -85,14 +106,18 @@ export const Post = ({
     }
   }
 
-  const handleRemoveComment = async (commentId: string) => {
+  const handleDeleteComment = async (commentId: string) => {
     try {
-      const response = await api.delete(`/posts/${id}/comments/${commentId}`)
+      const { data, errors } = await client.mutate({
+        mutation: DELETE_COMMENT,
+        variables: {
+          commentId,
+        },
+      })
 
-      setComments((oldData) =>
-        oldData.filter((comment) => comment.id !== commentId),
-      )
-      setCommentsCount((oldData) => oldData - 1)
+      //    !! NOTIFY ERROR
+      if (errors) return
+      onDeleteComment && onDeleteComment(commentId)
       // mutate(`/posts/${postId}/comments`);
     } catch (e) {
       console.log(e)
@@ -101,9 +126,14 @@ export const Post = ({
 
   const handleLike = async () => {
     try {
-      const response = await api.post(`/posts/${id}/likes`)
-      setLikesCount((oldState) => oldState + 1)
-      setLiked(true)
+      const response = await client.mutate({
+        mutation: LIKE_POST,
+        variables: {
+          postId: id,
+        },
+      })
+
+      onLike && onLike()
     } catch (err) {
       console.log(err)
     }
@@ -111,9 +141,14 @@ export const Post = ({
 
   const handleRemoveLike = async () => {
     try {
-      const response = await api.delete(`/posts/${id}/likes`)
-      setLikesCount((oldState) => oldState - 1)
-      setLiked(false)
+      const response = await client.mutate({
+        mutation: REMOVE_LIKE,
+        variables: {
+          postId: id,
+        },
+      })
+
+      onRemoveLike && onRemoveLike()
     } catch (err) {
       console.log(err)
     }
@@ -121,6 +156,7 @@ export const Post = ({
 
   const onPostDelete = async () => {
     await Router.replace(`/${user?.profile_name}`)
+
     Router.reload()
   }
   return (
@@ -139,7 +175,7 @@ export const Post = ({
             <Avatar
               className="w-12 h-12"
               name={author.name}
-              avatar_url={author.avatar_url}
+              avatar={author.avatar}
             />
 
             <div className="flex flex-col   ">
@@ -161,7 +197,7 @@ export const Post = ({
           <div className="flex flex-col gap-4 p-4 flex-grow">
             {comments.map((comment) => (
               <Comment
-                handleRemove={() => handleRemoveComment(comment.id)}
+                handleDelete={() => handleDeleteComment(comment.id)}
                 key={comment.id}
                 {...comment}
               />

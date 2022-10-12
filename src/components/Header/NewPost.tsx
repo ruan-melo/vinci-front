@@ -10,19 +10,28 @@ import { Dropzone } from '../Dropzone'
 import { ImagesCarousel } from '../ImagesCarousel'
 import { Modal, ModalFooter } from '../Modal'
 import { Textarea } from '../Textarea'
-
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { toast } from 'react-toastify'
 interface Inputs {
   caption: string
   files: File[]
 }
+
+const schema = yup
+  .object({
+    caption: yup.string().trim().max(2200),
+    // password_confirmation: yup
+    //   .string()
+    //   .oneOf([null, yup.ref('password')], 'Passwords must match'),
+  })
+  .required()
 
 export const NewPost = () => {
   const { isOpen, onClose: closeModal, onOpen: openModal } = useDisclosure()
   const { register, handleSubmit, watch, reset, resetField, control } =
     useForm<Inputs>()
   const formRef = useRef<HTMLFormElement>(null)
-
-  const [teste, setTeste] = useState('cara')
 
   const files = watch('files')
 
@@ -122,21 +131,29 @@ export const NewPost = () => {
               <Controller
                 name="files"
                 control={control}
-                render={({ field: { onChange, name, ref, onBlur } }) => {
+                render={({ field: { onChange } }) => {
                   return (
                     <Dropzone
                       id="post-image"
                       onChange={onChange}
-                      name={name}
-                      onBlur={onBlur}
-                      ref={ref}
+                      name={'name'}
+                      // onBlur={onBlur}
+                      // ref={ref}
+                      // ! MELHORAR MENSAGEM DE ERRO, NEM SEMPRE VAI SER FORMATO DE ARQUIVO INVÁLIDO
+                      onDropRejected={(files) => {
+                        toast(
+                          `Formato de arquivos inválidos: ${files
+                            .map((f) => f.file.name)
+                            .join(', ')}`,
+                        )
+                      }}
                       options={{
                         maxFiles: 5,
-                        accept: {
-                          'image/png': ['.png'],
-                          'image/bmp': ['.bmp'],
-                          'image/jpeg': ['.jpeg', '.jpg'],
-                        },
+                      }}
+                      accept={{
+                        'image/png': ['.png'],
+                        'image/bmp': ['.bmp'],
+                        'image/jpeg': ['.jpeg', '.jpg'],
                       }}
                     />
                     //  {/*(jpeg|png|jpg|bmp)*/}
@@ -147,9 +164,6 @@ export const NewPost = () => {
 
             {/* <label htmlFor='title' className='text-sm'>Title</label> */}
             <Textarea
-              onClick={() => {
-                setTeste('peste')
-              }}
               label="Caption"
               inputClassName="
                             resize-none 

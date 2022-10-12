@@ -12,7 +12,11 @@ import { ModalLikes } from '../../ModalLikes'
 import { PostOptions } from './PostOptions'
 import { LikeHeart } from '../../LikeHeart'
 import { client } from '../../../services/apolloClient'
-import { gql } from '@apollo/client'
+import {
+  CREATE_COMMENT,
+  LIKE_POST,
+  REMOVE_LIKE,
+} from '../../../services/queries'
 
 export interface PostProps extends TimelinePost {}
 
@@ -55,13 +59,6 @@ export const Post = ({
   const [commentsCount, setCommentsCount] = useState(commentsCountProps)
 
   const handleLike = async () => {
-    const LIKE_POST = gql`
-      mutation ($postId: String!) {
-        likePost(postId: $postId) {
-          id
-        }
-      }
-    `
     try {
       const response = await client.mutate({
         mutation: LIKE_POST,
@@ -78,14 +75,6 @@ export const Post = ({
 
   const handleRemoveLike = async () => {
     try {
-      const REMOVE_LIKE = gql`
-        mutation ($postId: String!) {
-          unlikePost(postId: $postId) {
-            id
-          }
-        }
-      `
-
       const response = await client.mutate({
         mutation: REMOVE_LIKE,
         variables: {
@@ -107,21 +96,6 @@ export const Post = ({
     if (text.length === 0) return
 
     try {
-      const CREATE_COMMENT = gql`
-        mutation CreateComment($postId: String!, $text: String!) {
-          comment(postId: $postId, text: $text) {
-            id
-            caption
-            author {
-              id
-              name
-              avatar
-              profile_name
-            }
-          }
-        }
-      `
-
       const response = await client.mutate({
         mutation: CREATE_COMMENT,
         variables: {

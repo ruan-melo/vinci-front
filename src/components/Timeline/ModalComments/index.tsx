@@ -1,8 +1,9 @@
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 
 import { api } from '../../../services/api'
 import { client } from '../../../services/apolloClient'
+import { DELETE_COMMENT, POST_COMMENTS } from '../../../services/queries'
 import { Modal } from '../../Modal'
 import { Comment } from '../Post/Comment'
 
@@ -13,21 +14,6 @@ interface ModalCommentsProps {
   updateCommentsCount?: (quantity: number) => void
   onDeleteComment: () => void
 }
-
-const POST_COMMENTS = gql`
-  query GetPostComments($postId: String!) {
-    comments(postId: $postId) {
-      id
-      text
-      author {
-        id
-        name
-        avatar
-        profile_name
-      }
-    }
-  }
-`
 
 interface PostCommentsResponse {
   comments: {
@@ -57,17 +43,12 @@ export const ModalComments = ({
 
   useEffect(() => {
     if (isOpen) {
-      refetch()
+      refetch({ postId })
     }
-  }, [isOpen])
+  }, [isOpen, postId, refetch])
 
   const handleDeleteComment = async (id: string) => {
     try {
-      const DELETE_COMMENT = gql`
-        mutation ($commentId: String!) {
-          deleteComment(commentId: $commentId)
-        }
-      `
       const response = await client.mutate({
         mutation: DELETE_COMMENT,
         variables: {

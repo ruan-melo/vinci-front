@@ -3,7 +3,7 @@ import { parseCookies } from 'nookies'
 
 export function getApiClient(ctx?: any): AxiosInstance {
   const api = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://192.168.0.108:3000',
   })
 
   const { 'vinci:access_token': access_token } = parseCookies(ctx)

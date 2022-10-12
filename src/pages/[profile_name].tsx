@@ -17,7 +17,13 @@ import Router, { useRouter } from 'next/router'
 import { useAuth } from '../hooks/useAuth'
 import { decode } from 'jsonwebtoken'
 import { client } from '../services/apolloClient'
-import { gql } from '@apollo/client'
+import { ApolloError } from '@apollo/client'
+import { getApolloClient } from '../services/getApolloClient'
+import {
+  FOLLOW_USER,
+  GET_USER_PROFILE,
+  UNFOLLOW_USER,
+} from '../services/queries'
 interface UserProfile {
   id: string
   name: string
@@ -45,12 +51,16 @@ export const Profile: NextPage<ProfileProps> = ({
   posts,
   followed,
   isOwner,
+  followersCount,
   ...user
 }: ProfileProps) => {
   // const {user: loggedUser} = useAuth();
 
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
+  const [followersCountState, setFollowersCountState] = useState(followersCount)
   const selectedPost = posts.find((post) => post.id === selectedPostId)
+
+  console.log('posts', posts)
 
   const [isFollowing, setIsFollowing] = useState(followed)
   const {
@@ -81,13 +91,14 @@ export const Profile: NextPage<ProfileProps> = ({
 
   const handleFollow = async () => {
     try {
-      const FOLLOW_USER = gql`
-        mutation ($profile_name: String!) {
-          follow(profile_name: $profile_name)
-        }
-      `
-      const response = await api.post(`/users/${user?.profile_name}/follow`)
+      const response = await client.mutate({
+        mutation: FOLLOW_USER,
+        variables: {
+          profile_name: user.profile_name,
+        },
+      })
       setIsFollowing(true)
+      setFollowersCountState(followersCountState + 1)
     } catch {
       // TODO: handle error
       console.log('error')
@@ -95,12 +106,14 @@ export const Profile: NextPage<ProfileProps> = ({
   }
 
   const handleUnfollow = async () => {
-    try {
-      const response = await api.delete(`/users/${user?.profile_name}/follow`)
-      setIsFollowing(false)
-    } catch {
-      console.log('error')
-    }
+    const response = await client.mutate({
+      mutation: UNFOLLOW_USER,
+      variables: {
+        profile_name: user.profile_name,
+      },
+    })
+    setIsFollowing(false)
+    setFollowersCountState(followersCountState - 1)
   }
 
   const handleEditProfile = async () => {
@@ -165,8 +178,8 @@ export const Profile: NextPage<ProfileProps> = ({
 
             <div>
               <p>
-                {user.followsCount}{' '}
-                {user.followersCount > 1 ? 'followers' : 'follower'}
+                {followersCountState}{' '}
+                {followersCountState > 1 ? 'followers' : 'follower'}
               </p>
             </div>
 
@@ -198,7 +211,7 @@ export const Profile: NextPage<ProfileProps> = ({
         <PostModal
           isPostOpen={isPostOpen}
           closePost={handleClosePost}
-          post={{ ...selectedPost, author: user }}
+          post={{ ...selectedPost }}
         />
       )}
     </Main>
@@ -207,33 +220,10 @@ export const Profile: NextPage<ProfileProps> = ({
 
 export default Profile
 
-const GET_USER_PROFILE = gql`
-  query GetUserProfile($profile_name: String!) {
-    profile(profile_name: $profile_name) {
-      id
-      avatar
-      name
-      profile_name
-      posts {
-        author
-        caption
-        medias {
-          id
-          media_url
-          position
-        }
-      }
-      followsCount
-      followersCount
-      followed
-    }
-  }
-`
-
 export const getServerSideProps: GetServerSideProps<ProfileProps> = async (
   context,
 ) => {
-  const api = await getApiClient(context)
+  const client = await getApolloClient(context)
   const { 'vinci:access_token': access_token } = parseCookies(context)
 
   const profile_name = (context.params as { profile_name: string }).profile_name
@@ -259,11 +249,13 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async (
 
     return {
       props: {
-        ...data.profile,
+        followed,
+        ...user,
         isOwner,
       },
     }
   } catch (err) {
+    // console.log('error', (err as ApolloError).networkError?.result)
     return {
       notFound: true,
     }

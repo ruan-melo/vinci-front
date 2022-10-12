@@ -1,14 +1,21 @@
 import React, { ForwardedRef, forwardRef, useCallback, useState } from 'react'
 import { ChevronDoubleRightIcon } from '@heroicons/react/solid'
-import { DropzoneOptions, useDropzone } from 'react-dropzone'
+import {
+  DropzoneOptions,
+  FileError,
+  FileRejection,
+  useDropzone,
+} from 'react-dropzone'
 
 type DropzoneProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> & {
   id: string
   name: string
   multiple?: boolean
   labelClassName?: string
-  options?: DropzoneOptions
+  options?: Omit<DropzoneOptions, 'accept'>
+  accept: DropzoneOptions['accept']
   onChange: (files: File[]) => void
+  onDropRejected?: (errors: FileRejection[]) => void
 }
 
 // eslint-disable-next-line react/display-name
@@ -22,6 +29,8 @@ export const Dropzone = forwardRef(
       multiple,
       name,
       options,
+      accept,
+      onDropRejected,
       ...rest
     }: DropzoneProps,
     ref: ForwardedRef<HTMLInputElement>,
@@ -33,27 +42,60 @@ export const Dropzone = forwardRef(
       [onChange],
     )
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-      ...options,
-      onDrop,
-    })
+    function formatValidator(file: File): FileError | null {
+      if (!accept) return null
+
+      const matchMimeType = accept[file.type]
+
+      if (!matchMimeType) {
+        return {
+          code: 'file-invalid-type',
+          message: 'Tipo de arquivo inválido',
+        }
+      }
+
+      const matchExtension = matchMimeType.find((ext) =>
+        file.name.endsWith(ext),
+      )
+
+      if (!matchExtension) {
+        return {
+          code: 'file-invalid-extension',
+          message: 'Extensão do arquivo inválida',
+        }
+      }
+
+      return null
+    }
+
+    const { getRootProps, getInputProps, isDragActive, fileRejections } =
+      useDropzone({
+        // ...options,
+        validator: formatValidator,
+        onDrop,
+        onDropRejected,
+      })
 
     return (
       <div
         className={`h-full w-full flex flex-col p-4 gap-2 items-center justify-center  border-2 border-dashed bg-gray-100 border-gray-300 rounded-md
-      hover:bg-gray-200 transition-all duration-300
-      hover:border-green-300
-      ${labelClassName || ''}`}
+          hover:bg-gray-200 transition-all duration-300
+          hover:border-green-300
+        `}
         {...getRootProps()}
       >
-        {/* <label
-          className={`
-                    flex flex-col p-4 gap-2 items-center justify-center w-full border-2 border-dashed bg-gray-100 border-gray-300 rounded-md
-                    hover:bg-gray-200 transition-all duration-300
-                    hover:border-green-300
-                    ${labelClassName || ''}
-                `}
-        > */}
+        <input
+          id={id}
+          name={name}
+          multiple={multiple}
+          {...getInputProps({
+            onBlur,
+          })}
+          onChange={() => {
+            console.log('changed')
+          }}
+          ref={ref}
+        />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -71,20 +113,6 @@ export const Dropzone = forwardRef(
 
         <p className="text-md">Click to upload or drag and drop</p>
         <p className="text-sm">JPG, JPEG, BMP or PNG</p>
-
-        <input
-          id={id}
-          multiple={multiple}
-          className="hidden"
-          {...getInputProps({
-            onBlur,
-          })}
-          //   onChange={() => {
-          //     console.log('changed')
-          //   }}
-          ref={ref}
-        />
-        {/* </label> */}
       </div>
     )
   },

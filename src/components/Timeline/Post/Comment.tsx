@@ -3,10 +3,11 @@ import { TrashIcon } from '@heroicons/react/solid'
 import { useAuth } from '../../../hooks/useAuth'
 
 import { Avatar } from '../../Avatar'
+import { User as UserModel } from '../../../models/user'
 
 type CommentProps = {
   text: string
-  author: { id: string; profile_name: string; avatar: string; name: string }
+  author: Required<Pick<UserModel, 'id' | 'avatar' | 'profile_name' | 'name'>>
 } & {
   handleDelete?: () => void
 }

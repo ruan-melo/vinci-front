@@ -1,4 +1,5 @@
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
+import { POST_LIKES } from '../../services/queries'
 import { Modal } from '../Modal'
 import { Like } from '../Timeline/Post/Like'
 
@@ -7,21 +8,6 @@ interface ModalLikesProps {
   isOpen: boolean
   closeModal: () => void
 }
-
-const POST_LIKES = gql`
-  query GetPostLikes($id: String!) {
-    post(id: $id) {
-      likes {
-        user {
-          id
-          name
-          avatar
-          profile_name
-        }
-      }
-    }
-  }
-`
 
 interface PostLikesResponse {
   post: {

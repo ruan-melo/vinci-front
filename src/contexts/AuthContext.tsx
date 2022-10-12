@@ -2,8 +2,9 @@ import { createContext, ReactNode, useEffect, useState } from 'react'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import Router from 'next/router'
 import { api } from '../services/api'
-import { gql, useQuery } from '@apollo/client'
+import { makeVar, useQuery, useReactiveVar } from '@apollo/client'
 import { client } from '../services/apolloClient'
+import { GET_LOGGED_USER_INFO } from '../services/queries'
 
 export interface Profile {
   id: string
@@ -36,6 +37,7 @@ interface AuthContextData {
   login: (data: LoginData) => Promise<void>
   signUp: (data: SignUpData) => Promise<void>
   logout: () => void
+  editUser: (data: Profile) => void
   isAuthenticated: boolean
 }
 
@@ -45,27 +47,20 @@ interface AuthContextProviderProps {
   children: ReactNode
 }
 
-export const GET_LOGGED_USER_INFO = gql`
-  query GetLoggedUserInfo {
-    profile {
-      id
-      name
-      email
-      profile_name
-      avatar
-      createdAt
-      updatedAt
-    }
-  }
-`
+const userVar = makeVar<Profile | null>(null)
 
 export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
-  const [user, setUser] = useState<Profile | null>(null)
+  const user = useReactiveVar(userVar)
+
   //   const { 'vinci:access_token': access_token } = parseCookies()
   const { error, loading, data } = useQuery<{ profile: Profile }>(
     GET_LOGGED_USER_INFO,
   )
   const isAuthenticated = !!user
+
+  const editUser = (user: Profile) => {
+    userVar(user)
+  }
 
   //   const getUserProfile = async (access_token: string) => {
   //     const { data } = await api.get<User>('/users/profile')
@@ -75,13 +70,14 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
   useEffect(() => {
     if (data) {
-      setUser(data.profile)
+      userVar(data.profile)
     }
   }, [data])
 
   const logout = () => {
-    setUser(null)
+    userVar(null)
     destroyCookie(null, 'vinci:access_token')
+    client.clearStore()
     Router.push('/')
   }
 
@@ -89,7 +85,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     const { data } = await api.post<AccessResponse>('/auth/login', credentials)
 
     const { access_token, user } = data
-    setUser(user)
+    userVar(user)
     // Como está do lado do client não é necessário passar o ctx para a função (passa null no lugar)
     // Como diversas aplicações em desenvolvimento utilizando o localhost, é recomendado utilizar um prefixo para o cookie
     setCookie(null, 'vinci:access_token', access_token, {
@@ -108,7 +104,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     const { data } = await api.post<AccessResponse>('/auth/signup', credentials)
 
     const { access_token, user } = data
-    setUser(user)
+    userVar(user)
     setCookie(null, 'vinci:access_token', access_token, {
       maxAge: 7 * 24 * 60 * 60, // 7 days
     })
@@ -118,7 +114,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   }
   return (
     <AuthContext.Provider
-      value={{ user, login, isAuthenticated, logout, signUp }}
+      value={{ user, login, isAuthenticated, logout, signUp, editUser }}
     >
       {children}
     </AuthContext.Provider>

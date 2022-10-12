@@ -3,6 +3,8 @@ import { useDisclosure } from '@chakra-ui/hooks'
 import { Modal } from '../../Modal'
 import { toast } from 'react-toastify'
 import { api } from '../../../services/api'
+import { client } from '../../../services/apolloClient'
+import { DELETE_POST } from '../../../services/queries'
 
 interface PostOptionsProps extends React.HTMLAttributes<HTMLDivElement> {
   postId: string
@@ -26,7 +28,12 @@ export const PostOptions = ({
 
   const handleDeletePost = async () => {
     try {
-      await api.delete(`/posts/${postId}`)
+      const response = await client.mutate({
+        mutation: DELETE_POST,
+        variables: {
+          postId,
+        },
+      })
       toast('Post deleted', {
         position: 'bottom-center',
         autoClose: 2000,

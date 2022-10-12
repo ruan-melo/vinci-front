@@ -1,7 +1,11 @@
+import { ApolloError } from '@apollo/client'
 import { GetServerSideProps } from 'next'
 import { Post, PostProps } from '../../components/Post'
+import { PostResponse } from '../../components/PostModal'
 import { Main } from '../../layouts/Main'
 import { getApiClient } from '../../services/getApiClient'
+import { getApolloClient } from '../../services/getApolloClient'
+import { GET_POST } from '../../services/queries'
 
 type PagePostProps = { post: PostProps | null }
 
@@ -28,26 +32,24 @@ export const getServerSideProps: GetServerSideProps<PagePostProps> = async (
   context: any,
 ) => {
   const postId = (context.params as { postId: string }).postId
-  const api = getApiClient(context)
+  const client = getApolloClient(context)
 
   try {
-    const response = await api.get<PostProps>(
-      `/posts/${postId}?comments=true&medias=true&author=true&liked=true&likes_count=true&comments_count=true`,
-    )
+    const response = await client.query<PostResponse>({
+      query: GET_POST,
+      variables: {
+        id: postId,
+      },
+    })
 
-    console.log('RESPONSE POSTPAGE USERID', response.data.author.id)
     return {
       props: {
-        post: { ...response.data },
+        ...response.data,
       },
     }
   } catch (e) {
-    console.log(e)
-  }
-
-  return {
-    props: {
-      post: null,
-    },
+    return {
+      notFound: true,
+    }
   }
 }

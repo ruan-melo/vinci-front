@@ -16,6 +16,9 @@ import { EditAvatar } from './EditAvatar'
 import { toast } from 'react-toastify'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { client } from '../../services/apolloClient'
+import { EDIT_PROFILE } from '../../services/queries'
+import { Profile } from '../../contexts/AuthContext'
 
 interface Inputs {
   name: string
@@ -30,7 +33,7 @@ const schema = yup
   .required()
 
 const Edit = () => {
-  const { user } = useAuth()
+  const { user, editUser } = useAuth()
   const {
     register,
     reset,
@@ -54,10 +57,28 @@ const Edit = () => {
   }, [user])
 
   const onSubmit = async (data: Inputs) => {
-    console.log('data', data)
+    const variables: { name?: string; profile_name?: string } = {}
+
+    if (data.name) {
+      variables.name = data.name
+    }
+
+    if (data.profile_name) {
+      variables.profile_name = data.profile_name
+    }
     try {
-      const response = await api.put('/users/profile', data)
-      Router.reload()
+      const { data, errors } = await client.mutate<{ profile: Profile }>({
+        mutation: EDIT_PROFILE,
+        variables,
+      })
+
+      if (errors || !data) {
+        toast.error('Error')
+        return
+      }
+
+      editUser(data.profile)
+      // Router.reload()
     } catch (e) {
       toast('An error ocurred during profile update', {
         type: 'error',
@@ -92,7 +113,7 @@ const Edit = () => {
       <div className="flex flex-col gap-4 p-6 bg-white mt-4 border max-w-2xl mx-auto  ">
         <h4 className="text-center text-md font-bold">Edit Profile</h4>
         <div className="relative w-fit mx-auto">
-          <Avatar name={user?.name} avatar_url={user.avatar_url} />
+          <Avatar name={user?.name} avatar={user.avatar} />
           <div
             onClick={openEditAvatar}
             className="cursor-pointer absolute bottom-0 right-0 w-6 h-6 bg-white border border-gray-200 rounded-full p-1"
