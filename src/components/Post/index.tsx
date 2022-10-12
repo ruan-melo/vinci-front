@@ -213,12 +213,12 @@ export const Post = ({
                                   </div>
                                  */}
           </div>
-          <div className="border-t border-gray-100  p-4">
+          <div className="border-t border-gray-100  p-4 ">
             <div className="flex gap-4">
               {/* <HeartIconSolid/> */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-gray-500">
                 <LikeHeart
-                  className="w-8 h-8 cursor-pointer"
+                  className="w-8 h-8 cursor-pointer text-gray-500"
                   handleLike={handleLike}
                   handleRemoveLike={handleRemoveLike}
                   liked={liked}
@@ -242,7 +242,10 @@ export const Post = ({
               />
 
               <div className=" transition-all duration-200  flex items-center  bg-opacity-30 p-2  gap-2 text-sm text-gray-500">
-                <AnnotationIcon className="h-8 w-8 " aria-hidden="true" />
+                <AnnotationIcon
+                  className="h-8 w-8 text-gray-500"
+                  aria-hidden="true"
+                />
                 <span>
                   {commentsCount} {commentsCount === 1 ? 'comment' : 'comments'}
                 </span>

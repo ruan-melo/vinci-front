@@ -159,7 +159,9 @@ export const Post = ({
         ) : null}
       </div>
       <div className="flex items-center px-2   gap-4">
-        <div className="cursor-pointer flex items-center  bg-opacity-30 p-2  gap-2 text-sm text-gray-500">
+        <div
+          className={`cursor-pointer flex items-center  bg-opacity-30 p-2  gap-2 text-sm text-gray-500`}
+        >
           <LikeHeart
             handleLike={handleLike}
             handleRemoveLike={handleRemoveLike}
@@ -170,10 +172,12 @@ export const Post = ({
           <span
             onClick={onOpenModalLikes}
             className={`hover:text-gray-800 transition-all duration-200 ${
-              likesCount === 0 ? 'pointer-events-none cursor-default' : ''
+              likesCount === 0
+                ? 'pointer-events-none disabled cursor-default'
+                : ''
             }`}
           >
-            {likesCount} Likes
+            {likesCount} {likesCount === 1 ? 'like' : 'likes'}
           </span>
         </div>
 
@@ -183,9 +187,17 @@ export const Post = ({
           closeModal={onCloseModalLikes}
         />
 
-        <div className="hover:text-gray-800 transition-all duration-200 cursor-pointer flex items-center  bg-opacity-30 p-2  gap-2 text-sm text-gray-500">
+        <div
+          className={`${
+            commentsCount === 0
+              ? 'pointer-events-none disabled cursor-default'
+              : ''
+          } hover:text-gray-800 transition-all duration-200 cursor-pointer flex items-center  bg-opacity-30 p-2  gap-2 text-sm text-gray-500`}
+        >
           <AnnotationIcon className=" h-5 w-5 " />
-          <span onClick={onOpenModalComments}>{commentsCount} Comments</span>
+          <span onClick={onOpenModalComments}>
+            {commentsCount} {commentsCount === 1 ? 'comment' : 'comments'}
+          </span>
         </div>
 
         <ModalComments

@@ -23,6 +23,8 @@ export function UserMenu() {
     return null
   }
 
+  console.log('user avatar', user.avatar)
+
   return (
     <div className="flex items-center justify-center mr-0">
       <Menu as="div" className="relative inline-block text-left">
@@ -31,7 +33,7 @@ export function UserMenu() {
             <div className="mr-2 relative  w-12 h-12 rounded-full overflow-hidden text-white bg-white fill-current">
               <Image
                 className="bg-gray-300 fill-current"
-                src={user.avatar_url ?? UserAvatar}
+                src={user.avatar ?? UserAvatar}
                 width={'80px'}
                 height={'80px'}
                 objectFit="cover"

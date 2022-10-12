@@ -4,9 +4,11 @@ import { InputGroup } from '../../components/InputGroup'
 import { Main } from '../../layouts/Main'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { api } from '../../services/api'
 import { toast } from 'react-toastify'
-import axios from 'axios'
+import { client } from '../../services/apolloClient'
+import { EDIT_PASSWORD } from '../../services/queries'
+import { ApolloError } from '@apollo/client'
+import { extractInfoFromGraphQLError } from '../../helpers/extractInfoFromGraphQLError'
 
 type Inputs = {
   current_password: string
@@ -34,24 +36,28 @@ const ChangePassword = () => {
 
   const onSubmit = async (data: Inputs) => {
     try {
-      const response = await api.patch('/users/password', {
-        current_password: data.current_password,
-        password: data.password,
+      const response = await client.mutate({
+        mutation: EDIT_PASSWORD,
+        variables: {
+          currentPassword: data.current_password,
+          password: data.password,
+        },
       })
+
+      toast.success('Password changed successfully')
     } catch (e) {
-      if (axios.isAxiosError(e)) {
-        if (e.response?.status === 401) {
-          toast.error('Current password is incorrect', {
-            position: 'top-center',
+      if (e instanceof ApolloError) {
+        const errorInfo = extractInfoFromGraphQLError(e)
+
+        if (errorInfo.isNetworkError) {
+          toast.error(errorInfo.message, {
+            position: 'top-right',
           })
         } else {
-          toast.error('An error ocurred during password update', {
-            position: 'top-center',
-          })
+          toast.error(errorInfo.message, { position: 'top-right' })
         }
       } else {
-        toast('An error ocurred during password update', {
-          type: 'error',
+        toast.error('An error ocurred during password update', {
           position: 'top-center',
         })
       }

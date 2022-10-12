@@ -155,6 +155,17 @@ export const GET_USER_PROFILE = gql`
   }
 `
 
+export const SEARCH_USER = gql`
+  query SearchUser($search: String!) {
+    searchUser(search: $search) {
+      id
+      name
+      profile_name
+      avatar
+    }
+  }
+`
+
 export const EDIT_PROFILE = gql`
   mutation ($name: String, $profile_name: String) {
     editProfile(name: $name, profile_name: $profile_name) {
@@ -165,6 +176,17 @@ export const EDIT_PROFILE = gql`
       avatar
       createdAt
       updatedAt
+    }
+  }
+`
+
+export const EDIT_PASSWORD = gql`
+  mutation ($currentPassword: String!, $password: String!) {
+    editPassword(currentPassword: $currentPassword, password: $password) {
+      id
+      name
+      email
+      profile_name
     }
   }
 `

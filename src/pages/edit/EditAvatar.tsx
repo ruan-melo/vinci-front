@@ -29,7 +29,7 @@ export const EditAvatar = () => {
       fd.append('file', blob)
       fd.append('teste', 'cara')
       fd.append('teste2', 'cara2')
-      const response = await api.patch('/users/avatar', fd)
+      const response = await api.patch('/users/profile/avatar', fd)
 
       // console.log('blob', blob);
       // console.log('final',window.URL.createObjectURL(blob))
