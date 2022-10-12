@@ -64,13 +64,13 @@ export const Search = () => {
         containerClassName="mx-auto w-[200px] lg:w-[400px]"
         button={searchButton}
       />
-      <datalist id="users">
+      {/* <datalist id="users">
         {data?.searchUser.map((user) => (
           <option key={user.id} value={user.profile_name}>
             {user.name}
           </option>
         ))}
-      </datalist>
+      </datalist> */}
     </>
   )
 }
