@@ -5,6 +5,10 @@ import { api } from '../services/api'
 import { makeVar, useQuery, useReactiveVar } from '@apollo/client'
 import { client } from '../services/apolloClient'
 import { GET_LOGGED_USER_INFO } from '../services/queries'
+import { getFirebaseMessaging, registerFCM } from '../services/firebase'
+import { deleteToken, getToken } from 'firebase/messaging'
+import { toast } from 'react-toastify'
+import axios from 'axios'
 
 export interface Profile {
   id: string
@@ -69,12 +73,41 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   //   }
 
   useEffect(() => {
+    if (user) {
+      if (typeof window !== 'undefined') {
+        registerFCM()
+          .then((token) => {
+            console.log(token)
+          })
+          .catch((err) => {
+            console.log('err: ', err)
+          })
+      }
+    }
+  }, [user])
+
+  useEffect(() => {
     if (data) {
       userVar(data.profile)
     }
   }, [data])
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      const messaging = getFirebaseMessaging()
+      if (messaging) {
+        const token = await getToken(messaging)
+        await deleteToken(messaging)
+        const response = await api.delete('/users/tokens', {
+          data: {
+            token,
+          },
+        })
+      }
+    } catch (e) {
+      toast.error('Erro ao deslogar ' + e)
+    }
+
     userVar(null)
     destroyCookie(null, 'vinci:access_token')
     client.clearStore()
@@ -82,18 +115,28 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   }
 
   async function login(credentials: { email: string; password: string }) {
-    const { data } = await api.post<AccessResponse>('/auth/login', credentials)
+    toast.info('Logando...')
+    try {
+      const { data } = await api.post<AccessResponse>(
+        '/auth/login',
+        credentials,
+      )
+      const { access_token, user } = data
+      userVar(user)
+      // Como está do lado do client não é necessário passar o ctx para a função (passa null no lugar)
+      // Como diversas aplicações em desenvolvimento utilizando o localhost, é recomendado utilizar um prefixo para o cookie
+      setCookie(null, 'vinci:access_token', access_token, {
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+      })
 
-    const { access_token, user } = data
-    userVar(user)
-    // Como está do lado do client não é necessário passar o ctx para a função (passa null no lugar)
-    // Como diversas aplicações em desenvolvimento utilizando o localhost, é recomendado utilizar um prefixo para o cookie
-    setCookie(null, 'vinci:access_token', access_token, {
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-    })
-
-    api.defaults.headers.common.Authorization = `Bearer ${access_token}`
-    Router.push('/')
+      toast.info('Logado')
+      api.defaults.headers.common.Authorization = `Bearer ${access_token}`
+      Router.push('/')
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        toast.error('Erro ao logar ' + e.code)
+      }
+    }
   }
 
   async function signUp(credentials: {

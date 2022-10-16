@@ -1,9 +1,14 @@
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, initializeApp } from 'firebase/app'
-import { getMessaging, getToken, Messaging } from 'firebase/messaging'
+import {
+  getMessaging,
+  getToken,
+  Messaging,
+  onMessage,
+} from 'firebase/messaging'
+
 import { Analytics, getAnalytics } from 'firebase/analytics'
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { api } from './api'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,34 +21,45 @@ const firebaseConfig = {
 }
 
 // Initialize Firebase
+let app: FirebaseApp
+let messaging: Messaging
+let analytics: Analytics
 
-// messaging.usePublicVapidKey(process.env.NEXT_PUBLIC_FIREBASE_PUBLIC_VAPID_KEY)
-
-export function requestPermission() {
+export async function registerFCM() {
   console.log('Requesting permission...')
-  return Notification.requestPermission()
+  const token = await Notification.requestPermission()
     .then((permission) => {
       if (permission === 'granted') {
-        console.log('Permission granted')
         const messaging = getFirebaseMessaging()
-
-        if (!messaging) {
-          return
-        }
+        if (!messaging) return
+        onMessage(messaging, (payload) => {
+          console.log('Message received in primeiro plano ', payload)
+        })
         return getToken(messaging, {
           vapidKey: process.env.NEXT_PUBLIC_FIREBASE_PUBLIC_VAPID_KEY,
         })
       }
     })
     .then((token) => {
-      console.log('Token: ', token)
+      // Verify if token is valid
+      if (!token) {
+        return null
+      }
+      const last_fcm_token = localStorage.getItem('vinci:fcmToken')
+
+      // If token is valid and different from the last one, save it
+      if (token && last_fcm_token !== token) {
+        localStorage.setItem('vinci:fcmToken', token)
+
+        api.post('/users/tokens', { token })
+      }
+
       return token
     })
+
+  return token
 }
 
-let app: FirebaseApp
-let messaging: Messaging
-let analytics: Analytics
 // if (typeof window !== 'undefined') {
 //     app = initializeApp(firebaseConfig)
 // }
@@ -65,7 +81,7 @@ export function getFirebaseMessaging() {
   if (!app) {
     return null
   }
-  messaging = getMessaging(app)
+  messaging = getMessaging()
   return messaging
 }
 

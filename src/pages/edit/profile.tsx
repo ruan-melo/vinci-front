@@ -105,7 +105,7 @@ const Edit = () => {
   }
 
   if (!user) {
-    return <div>error</div>
+    return <div>tela de loading</div>
   }
 
   return (

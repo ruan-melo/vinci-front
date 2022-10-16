@@ -29,7 +29,7 @@ export const InputGroup = forwardRef(
     ref: ForwardedRef<HTMLInputElement>,
   ) => {
     return (
-      <div className={`${containerClassName}`}>
+      <div className={`${containerClassName || ''}`}>
         {label && (
           <label
             className="block text-sm font-medium text-gray-700"

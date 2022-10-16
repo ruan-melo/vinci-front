@@ -12,6 +12,8 @@ import {
 } from 'react-toastify'
 import { ApolloProvider } from '@apollo/client'
 import { client } from '../services/apolloClient'
+import { useEffect } from 'react'
+import { getFirebaseMessaging } from '../services/firebase'
 
 // if (typeof window !== "undefined") {
 //   import('flowbite');
@@ -77,6 +79,21 @@ function MyApp({ Component, pageProps }: AppProps) {
       </AuthContextProvider>
     </ApolloProvider>
   )
+}
+
+if (typeof window !== 'undefined') {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker
+        .register('/firebase-messaging-sw.js')
+        .then((registration) => {
+          console.log('SW registered: ', registration)
+        })
+        .catch((registrationError) => {
+          console.log('SW registration failed: ', registrationError)
+        })
+    })
+  }
 }
 
 export default MyApp

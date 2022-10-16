@@ -1,0 +1,36 @@
+{
+    "name": "Vinci",
+    "short_name": "Vinci",
+    "theme_color": "#138e69",
+    "background_color": "#f8ea48",
+    "display": "browser",
+    "Scope": "/",
+    "start_url": "/",
+    "icons": [
+        {
+          "src": "/manifest-icon-192.maskable.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any"
+        },
+        {
+          "src": "/manifest-icon-192.maskable.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "maskable"
+        },
+        {
+          "src": "/manifest-icon-512.maskable.png",
+          "sizes": "512x512",
+          "type": "image/png",
+          "purpose": "any"
+        },
+        {
+          "src": "/manifest-icon-512.maskable.png",
+          "sizes": "512x512",
+          "type": "image/png",
+          "purpose": "maskable"
+        }
+      ],
+    "splash_pages": null
+  }

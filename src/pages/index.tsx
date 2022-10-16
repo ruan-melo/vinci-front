@@ -4,6 +4,7 @@ import { parseCookies } from 'nookies'
 import { useEffect } from 'react'
 // import { ImagesC } from "../components/ImagesCarousel"
 import { Timeline } from '../components/Timeline'
+import { NewPostContextProvider } from '../contexts/NewPostContext'
 import { Main } from '../layouts/Main'
 import { TimelinePost } from '../models'
 import { getApolloClient } from '../services/getApolloClient'
@@ -20,26 +21,6 @@ const Home = () => {
     GET_TIMELINE,
   )
 
-  // )
-
-  // console.log('timeline data', data)
-
-  // useEffect(() => {
-  //   // async function getToken() {
-  //   //   const teste = await requestPermission()
-  //   //   const messaging = getFirebaseMessaging()
-  //   //   if (!messaging) return
-  //   //   onMessage(messaging, (payload) => {
-  //   //     console.log('Message received. ', payload)
-  //   //     // ...
-  //   //   })
-  //   //   console.log('initialize on message', messaging)
-  //   // }
-  //   // if (window !== undefined) {
-  //   //   getToken()
-  //   // }
-  // }, [])
-
   if (loading) return <div>loading...</div>
 
   return (
@@ -51,9 +32,9 @@ const Home = () => {
 
 const Page: NextPage<HomeProps> = () => {
   return (
-    // <SWRConfig value={{ fallback }}>
+    // <NewPostContextProvider>
     <Home />
-    // </SWRConfig>
+    // </NewPostContextProvider>
   )
 }
 

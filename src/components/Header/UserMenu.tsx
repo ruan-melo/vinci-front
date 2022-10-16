@@ -1,10 +1,16 @@
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { ChevronDownIcon, LogoutIcon, UserIcon } from '@heroicons/react/solid'
+import {
+  AdjustmentsIcon,
+  ChevronDownIcon,
+  LogoutIcon,
+  UserIcon,
+} from '@heroicons/react/solid'
 import Image from 'next/image'
 import { useAuth } from '../../hooks/useAuth'
 import UserAvatar from '../../assets/default-user.svg'
 import Router from 'next/router'
+import { Avatar } from '../Avatar'
 
 export function UserMenu() {
   const { logout, user } = useAuth()
@@ -23,25 +29,20 @@ export function UserMenu() {
     return null
   }
 
+  const handleSettings = () => {
+    Router.push('/settings')
+  }
+
   console.log('user avatar', user.avatar)
 
   return (
-    <div className="flex items-center justify-center mr-0">
+    <div className="hidden md:flex items-center justify-center mr-0 ">
       <Menu as="div" className="relative inline-block text-left">
         <div>
           <Menu.Button className="inline-flex w-full justify-center items-center rounded-md text-sm font-medium text-gray-700 hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
-            <div className="mr-2 relative  w-12 h-12 rounded-full overflow-hidden text-white bg-white fill-current">
-              <Image
-                className="bg-gray-300 fill-current"
-                src={user.avatar ?? UserAvatar}
-                width={'80px'}
-                height={'80px'}
-                objectFit="cover"
-                alt={`${user.profile_name}'s profile picture`}
-              />
-            </div>
+            <Avatar {...user} className="h-10 w-10 md:mr-2 md:h-12 md:w-12" />
 
-            <div className="hidden sm:flex flex-col">
+            <div className="hidden lg:flex flex-col">
               {user.name}
               <span className="text-xs w-full text-left">
                 @{user.profile_name}
@@ -49,7 +50,7 @@ export function UserMenu() {
             </div>
 
             <ChevronDownIcon
-              className="ml-2 -mr-1 h-5 w-5"
+              className="md:ml-2 -mr-1 h-5 w-5"
               aria-hidden="true"
             />
           </Menu.Button>
@@ -75,6 +76,23 @@ export function UserMenu() {
                   >
                     <UserIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                     Profile
+                  </button>
+                )}
+              </Menu.Item>
+
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    className={`${
+                      active ? 'bg-green-600 text-white' : 'text-gray-700'
+                    } transition-all duration-200 group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    onClick={handleSettings}
+                  >
+                    <AdjustmentsIcon
+                      className="mr-2 h-5 w-5"
+                      aria-hidden="true"
+                    />
+                    Settings
                   </button>
                 )}
               </Menu.Item>

@@ -1,7 +1,7 @@
 import { useDisclosure } from '@chakra-ui/hooks'
 import { PlusIcon } from '@heroicons/react/solid'
 import Image from 'next/image'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useImageLoader } from '../../hooks/useImageLoader'
 import { api } from '../../services/api'
@@ -13,7 +13,6 @@ import { Textarea } from '../Textarea'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { toast } from 'react-toastify'
-import { NewPostContext } from '../../contexts/NewPostContext'
 interface Inputs {
   caption: string
   files: File[]
@@ -29,7 +28,7 @@ const schema = yup
   .required()
 
 export const NewPost = () => {
-  const { isOpen, close, open } = useContext(NewPostContext)
+  const { isOpen, onClose: closeModal, onOpen: openModal } = useDisclosure()
   const { register, handleSubmit, watch, reset, resetField, control } =
     useForm<Inputs>()
   const formRef = useRef<HTMLFormElement>(null)
@@ -40,7 +39,7 @@ export const NewPost = () => {
 
   const handleClose = () => {
     reset()
-    close()
+    closeModal()
   }
 
   const handlePost = async (data: Inputs) => {
@@ -62,18 +61,22 @@ export const NewPost = () => {
     // body.append('medias',  JSON.stringify([{position: 0, mediaName: data.files[0].name}, {position: 1, mediaName: data.files[1].name}]));
 
     const response = await api.post('/posts', body)
-
-    if (response.status === 201) {
-      toast.success('Post criado com sucesso!')
-      handleClose()
-    }
   }
   const handleClearImages = () => {
     resetField('files')
   }
 
+  const imagesValueRef = useRef<[]>([])
+
   return (
     <>
+      <button
+        onClick={openModal}
+        className="text-green-600  rounded-sm p-2  transition-all duration-200 ml-6 flex text-center items-center justify-center"
+      >
+        <PlusIcon className="h-5 w-5 " />
+        <span className="inline">New post</span>
+      </button>
       <Modal
         isOpen={isOpen}
         title="New post"
@@ -138,7 +141,6 @@ export const NewPost = () => {
                       // ref={ref}
                       // ! MELHORAR MENSAGEM DE ERRO, NEM SEMPRE VAI SER FORMATO DE ARQUIVO INVÁLIDO
                       onDropRejected={(files) => {
-                        console.log('files rejected', files)
                         toast(
                           `Formato de arquivos inválidos: ${files
                             .map((f) => f.file.name)

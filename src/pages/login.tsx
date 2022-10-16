@@ -33,7 +33,7 @@ const Login = () => {
   return (
     <Access>
       <div className="p-6 mx-auto w-full max-w-[500px]">
-        <Logo />
+        <Logo className="text-4xl" />
         <form
           onSubmit={handleSubmit(handleLogIn)}
           className="mt-4 mx-auto gap-4 flex justify-center align-center flex-col max-w-md"

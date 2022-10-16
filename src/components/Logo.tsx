@@ -1,15 +1,23 @@
-import Router from "next/router";
-
+import Router from 'next/router'
 
 interface LogoProps {
-    className?: string;
+  className?: string
+  link?: boolean
 }
 
-export const Logo = ( {className}: LogoProps) => {
-    
-    return (
-        <h1 className = {`cursor-pointer text-6xl text-center text-green-900 font-logo ${className}`} onClick={() => {
-            Router.push('/');
-        }}>VINCI</h1>
-    )
+export const Logo = ({ className, link }: LogoProps) => {
+  return (
+    <h1
+      className={`cursor-pointer text-center text-green-900 font-logo ${className}`}
+      onClick={
+        link
+          ? () => {
+              Router.push('/')
+            }
+          : undefined
+      }
+    >
+      VINCI
+    </h1>
+  )
 }

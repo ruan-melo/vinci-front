@@ -60,8 +60,6 @@ export const Profile: NextPage<ProfileProps> = ({
   const [followersCountState, setFollowersCountState] = useState(followersCount)
   const selectedPost = posts.find((post) => post.id === selectedPostId)
 
-  console.log('posts', posts)
-
   const [isFollowing, setIsFollowing] = useState(followed)
   const {
     isOpen: isPostOpen,
@@ -182,10 +180,10 @@ export const Profile: NextPage<ProfileProps> = ({
                 {followersCountState > 1 ? 'followers' : 'follower'}
               </p>
             </div>
-
+            {/* 
             <div>
               <p>Followed by park_tien, melissa_andrade and 3 others</p>
-            </div>
+            </div> */}
           </div>
         </div>
 

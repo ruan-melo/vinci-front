@@ -1,6 +1,9 @@
 /* eslint-disable no-undef */
-importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js')
-importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js')
+importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js')
+importScripts(
+  'https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js',
+)
+// importScripts('/nookies.min.js')
 
 const firebaseConfig = {
   apiKey: 'AIzaSyD2vBrDqSZdSZzqrPmz_1uQ--w668VXZRs',
@@ -13,24 +16,40 @@ const firebaseConfig = {
 }
 const app = firebase.initializeApp(firebaseConfig)
 const messaging = firebase.messaging()
-
-// messaging.onBackgroundMessage(function (payload) {
-//   const promiseChain = clients
-//     .matchAll({
-//       type: 'window',
-//       includeUncontrolled: true,
-//     })
-//     .then((windowClients) => {
-//       for (let i = 0; i < windowClients.length; i++) {
-//         const windowClient = windowClients[i]
-//         windowClient.postMessage(payload)
-//       }
-//     })
-//     .then(() => {
-//       return registration.showNotification('my notification title')
-//     })
-//   return promiseChain
+// let access_token = ''
+// messaging.onMessage((payload) => {
+//   console.log('Message received in primeiro plano. ', payload)
+//   // ...
 // })
+
+messaging.onBackgroundMessage(async (payload) => {
+  console.log(
+    '[firebase-messaging-sw.js] Received background message ',
+    payload,
+  )
+  // Customize notification here
+  const notificationTitle = 'Background Message Title'
+  const notificationOptions = {
+    body: 'Background Message body.',
+    icon: '/firebase-logo.png',
+  }
+
+  if (payload.data.type && access_token) {
+    const notification_id = payload.data.notification_id
+    // const response = await fetch(
+    //   `http://localhost:3000/users/notifications/${notification_id}`,
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${access_token}`,
+    //     },
+    //   },
+    // )
+
+    //   console.log('notification response', response)
+    //   const token = localStorage.getItem('vinci:token')
+    self.registration.showNotification(notificationTitle, notificationOptions)
+  }
+})
 
 self.addEventListener('notificationclick', function (event) {
   console.log('NOTIFICATION CLICKED')
@@ -38,4 +57,35 @@ self.addEventListener('notificationclick', function (event) {
   // ...
 })
 
-console.log('sw registered')
+// self.addEventListener('message', (ev) => {
+//   const data = ev.data
+
+//   if (typeof data === 'string') {
+//     console.log('token deleted')
+//     return
+//   }
+
+//   access_token = data.access_token
+
+//   // console.log('Service Worker received', data, clientId);
+//   // if ('addPerson' in data) {
+//   //   const msg = 'Thanks. Pretend I did something with the data.'
+//   //   sendMessage(
+//   //     {
+//   //       code: 0,
+//   //       message: msg,
+//   //     },
+//   //     clientId,
+//   //   )
+//   // }
+//   // if ('otherAction' in data) {
+//   //   const msg = 'Hola'
+//   //   sendMessage({
+//   //     code: 0,
+//   //     message: msg,
+//   //   })
+//   // }
+// })
+
+// console.log('access_token')
+// console.log('sw registered')
