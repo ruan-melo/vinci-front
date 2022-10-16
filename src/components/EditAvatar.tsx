@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
 import { toast } from 'react-toastify'
-import { Button } from '../../components/Button'
-import { Dropzone } from '../../components/Dropzone'
-import { useImageLoader } from '../../hooks/useImageLoader'
-import { api } from '../../services/api'
+import { Button } from './Button'
+import { Dropzone } from './Dropzone'
+import { useImageLoader } from '../hooks/useImageLoader'
+import { api } from '../services/api'
 
 export const EditAvatar = () => {
   const [scale, setScale] = useState(1)
