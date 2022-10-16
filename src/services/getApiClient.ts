@@ -6,6 +6,8 @@ export function getApiClient(ctx?: any): AxiosInstance {
     baseURL: process.env.NEXT_PUBLIC_API_URL,
   })
 
+  api.defaults.headers.common['ngrok-skip-browser-warning'] = 'true'
+
   const { 'vinci:access_token': access_token } = parseCookies(ctx)
 
   if (access_token) {

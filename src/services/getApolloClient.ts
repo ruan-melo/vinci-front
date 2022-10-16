@@ -14,6 +14,7 @@ export const getApolloClient = (ctx?: any) => {
     return {
       headers: {
         ...headers,
+        'ngrok-skip-browser-warning': 'true',
         authorization: access_token ? `Bearer ${access_token}` : '',
       },
     }
