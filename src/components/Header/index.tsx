@@ -1,11 +1,8 @@
 import { Logo } from '../Logo'
 import { PlusIcon } from '@heroicons/react/solid'
-import { InputGroup } from '../InputGroup'
 import { Search } from './Search'
 import { UserMenu } from './UserMenu'
 import { Notifications, Notification } from './Notifications'
-import useMediaQuery from '../../hooks/useMediaQuery'
-import { NewPost } from './NewPost'
 import { NewPostContext } from '../../contexts/NewPostContext'
 import { useContext } from 'react'
 

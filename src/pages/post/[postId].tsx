@@ -1,9 +1,7 @@
-import { ApolloError } from '@apollo/client'
 import { GetServerSideProps } from 'next'
 import { Post, PostProps } from '../../components/Post'
 import { PostResponse } from '../../components/PostModal'
 import { Main } from '../../layouts/Main'
-import { getApiClient } from '../../services/getApiClient'
 import { getApolloClient } from '../../services/getApolloClient'
 import { GET_POST } from '../../services/queries'
 

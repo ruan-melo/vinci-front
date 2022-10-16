@@ -1,14 +1,12 @@
 import { Menu, Transition } from '@headlessui/react'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment } from 'react'
 import {
   AdjustmentsIcon,
   ChevronDownIcon,
   LogoutIcon,
   UserIcon,
 } from '@heroicons/react/solid'
-import Image from 'next/image'
 import { useAuth } from '../../hooks/useAuth'
-import UserAvatar from '../../assets/default-user.svg'
 import Router from 'next/router'
 import { Avatar } from '../Avatar'
 

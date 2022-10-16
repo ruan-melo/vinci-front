@@ -1,7 +1,6 @@
 import React, { Fragment, ReactNode } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/solid'
-import { Button } from '../Button'
 
 type ModalProps =
   | {

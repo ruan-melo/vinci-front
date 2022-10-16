@@ -1,6 +1,5 @@
-import { LocationMarkerIcon, XIcon } from '@heroicons/react/solid'
-import { title } from 'process'
-import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { XIcon } from '@heroicons/react/solid'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { CSSTransition } from 'react-transition-group'
 

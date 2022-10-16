@@ -1,7 +1,5 @@
 import { NextPage } from 'next'
 import Image from 'next/image'
-import { Button } from '../../components/Button'
-import { PostImage } from '../../components/Timeline/PostImage'
 import { useAuth } from '../../hooks/useAuth'
 import { Main } from '../../layouts/Main'
 

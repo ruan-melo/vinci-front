@@ -1,7 +1,7 @@
 import { useDisclosure } from '@chakra-ui/hooks'
 import { PlusIcon } from '@heroicons/react/solid'
 import Image from 'next/image'
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useImageLoader } from '../../hooks/useImageLoader'
 import { api } from '../../services/api'
@@ -11,7 +11,6 @@ import { ImagesCarousel } from '../ImagesCarousel'
 import { Modal, ModalFooter } from '../Modal'
 import { Textarea } from '../Textarea'
 import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 import { toast } from 'react-toastify'
 interface Inputs {
   caption: string

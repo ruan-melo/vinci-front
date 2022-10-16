@@ -6,13 +6,12 @@ import {
 } from '@heroicons/react/outline'
 import {
   HomeIcon as HomeIconSolid,
-  MenuIcon,
   PlusCircleIcon as PlusCircleIconSolid,
   AdjustmentsIcon as AdjustmentsIconSolid,
 } from '@heroicons/react/solid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ReactNode, useContext, useState } from 'react'
+import { useContext } from 'react'
 import { NewPostContext } from '../contexts/NewPostContext'
 import { useAuth } from '../hooks/useAuth'
 import { Avatar } from './Avatar'

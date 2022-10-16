@@ -2,7 +2,6 @@ import { Popover, Transition } from '@headlessui/react'
 import {
   AnnotationIcon,
   BellIcon,
-  ChevronDownIcon,
   HeartIcon,
   UserAddIcon,
 } from '@heroicons/react/solid'

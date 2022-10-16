@@ -1,11 +1,11 @@
 import { useQuery } from '@apollo/client'
-import { PlusIcon, SearchIcon } from '@heroicons/react/solid'
+import { SearchIcon } from '@heroicons/react/solid'
 import Router from 'next/router'
 import { useRef, useState } from 'react'
 import { Profile } from '../../contexts/AuthContext'
 import { SEARCH_USER } from '../../services/queries'
 import { Avatar } from '../Avatar'
-import { InputGroup, InputGroupProps } from '../InputGroup'
+import { InputGroupProps } from '../InputGroup'
 
 const searchButton: InputGroupProps['button'] = {
   label: 'Search',

@@ -1,5 +1,4 @@
-import React, { ForwardedRef, forwardRef, useCallback, useState } from 'react'
-import { ChevronDoubleRightIcon } from '@heroicons/react/solid'
+import React, { ForwardedRef, forwardRef, useCallback } from 'react'
 import {
   DropzoneOptions,
   FileError,

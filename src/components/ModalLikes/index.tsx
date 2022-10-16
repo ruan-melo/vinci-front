@@ -23,7 +23,7 @@ interface PostLikesResponse {
 }
 
 export const ModalLikes = ({ postId, isOpen, closeModal }: ModalLikesProps) => {
-  const { data, error, loading } = useQuery<PostLikesResponse>(POST_LIKES, {
+  const { data } = useQuery<PostLikesResponse>(POST_LIKES, {
     variables: { id: postId },
   })
 
