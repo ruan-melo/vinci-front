@@ -28,10 +28,8 @@ export function UserMenu() {
   }
 
   const handleSettings = () => {
-    Router.push('/settings')
+    // Router.push('/settings')
   }
-
-  console.log('user avatar', user.avatar)
 
   return (
     <div className="hidden md:flex items-center justify-center mr-0 ">

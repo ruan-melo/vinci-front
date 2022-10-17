@@ -24,6 +24,7 @@ import {
   GET_USER_PROFILE,
   UNFOLLOW_USER,
 } from '../services/queries'
+import { Avatar } from '../components/Avatar'
 interface UserProfile {
   id: string
   name: string
@@ -72,15 +73,6 @@ export const Profile: NextPage<ProfileProps> = ({
     window.history.replaceState({}, '', `/post/${id}`)
     openPost()
   }
-
-  //   useEffect(() => {
-  //     if (data) {
-  //       window.history.pushState({}, `Post ${data.id}`, `/post/${data.id}`)
-  //     }
-  //     return () => {
-  //       console.log('history', window.history.state)
-  //     }
-  //   }, [data])
 
   const handleClosePost = () => {
     window.history.replaceState({}, '', `/${user?.profile_name}`)
@@ -133,24 +125,23 @@ export const Profile: NextPage<ProfileProps> = ({
 
   return (
     <Main>
-      <div className="bg-white border-2 border-gray-100  p-6 max-w-4xl w-full  mx-auto sm:mt-4">
+      <div className="bg-white md:border-2 border-gray-100  p-6 max-w-4xl w-full  mx-auto sm:mt-4">
         <div className="flex items-center border-b border-gray-200 pb-4">
-          <div className="shrink-0 h-48 w-48  relative  text-white bg-white fill-current ">
-            <Image
-              className="rounded-full w-full h-full bg-gray-300 fill-current"
-              src={user.avatar ?? UserAvatar}
-              width={'200px'}
-              height={'200px'}
-              objectFit="cover"
-              alt={'Foto de perfil'}
-            />
-          </div>
+          {/* <div className=" relative  text-white bg-white fill-current "> */}
+          <Avatar
+            className="shrink-0 h-20 w-20 md:h-32 md:w-32 lg:h-48 lg:w-48 "
+            avatar={user.avatar}
+            name={user.name}
+          />
+          {/* </div> */}
 
-          <div className="w-full  flex flex-col gap-2 justify-center ml-4">
+          <div className="w-full  flex flex-col gap-1 md:gap-2 justify-center ml-4">
             <div className="flex justify-between items-center ">
               <div className=" ">
-                <h3 className="text-2xl text-gray-800">{user.name}</h3>
-                <span className="text-sm">@{user.profile_name}</span>
+                <h3 className="text-lg md:text-2xl text-gray-800">
+                  {user.name}
+                </h3>
+                <span className="text-xs md:text-sm">@{user.profile_name}</span>
               </div>
 
               {isOwner && (
@@ -175,7 +166,7 @@ export const Profile: NextPage<ProfileProps> = ({
             </div>
 
             <div>
-              <p>
+              <p className="text-sm lg:text-sm">
                 {followersCountState}{' '}
                 {followersCountState > 1 ? 'followers' : 'follower'}
               </p>

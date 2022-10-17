@@ -95,6 +95,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const logout = async () => {
     try {
       const messaging = getFirebaseMessaging()
+      console.log('TESTE')
       if (messaging) {
         const token = await getToken(messaging)
         await deleteToken(messaging)
@@ -104,39 +105,32 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
           },
         })
       }
+      console.log('CARALHO')
     } catch (e) {
       toast.error('Erro ao deslogar ' + e)
     }
 
+    console.log('acabando')
+
     userVar(null)
     destroyCookie(null, 'vinci:access_token')
     client.clearStore()
+    console.log('FINAL')
     Router.push('/')
   }
 
   async function login(credentials: { email: string; password: string }) {
-    toast.info('Logando...')
-    try {
-      const { data } = await api.post<AccessResponse>(
-        '/auth/login',
-        credentials,
-      )
-      const { access_token, user } = data
-      userVar(user)
-      // Como está do lado do client não é necessário passar o ctx para a função (passa null no lugar)
-      // Como diversas aplicações em desenvolvimento utilizando o localhost, é recomendado utilizar um prefixo para o cookie
-      setCookie(null, 'vinci:access_token', access_token, {
-        maxAge: 7 * 24 * 60 * 60, // 7 days
-      })
+    const { data } = await api.post<AccessResponse>('/auth/login', credentials)
+    const { access_token, user } = data
+    userVar(user)
+    // Como está do lado do client não é necessário passar o ctx para a função (passa null no lugar)
+    // Como diversas aplicações em desenvolvimento utilizando o localhost, é recomendado utilizar um prefixo para o cookie
+    setCookie(null, 'vinci:access_token', access_token, {
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    })
 
-      toast.info('Logado')
-      api.defaults.headers.common.Authorization = `Bearer ${access_token}`
-      Router.push('/')
-    } catch (e) {
-      if (axios.isAxiosError(e)) {
-        toast.error('Erro ao logar ' + e.code)
-      }
-    }
+    api.defaults.headers.common.Authorization = `Bearer ${access_token}`
+    Router.push('/')
   }
 
   async function signUp(credentials: {

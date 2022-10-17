@@ -30,6 +30,30 @@ export const CREATE_COMMENT = gql`
   }
 `
 
+export const GET_NOTIFICATIONS = gql`
+  query GetNotifications {
+    notifications {
+      id
+      timestamp
+      read
+      follower {
+        id
+        name
+        avatar
+        profile_name
+      }
+    }
+  }
+`
+
+export const MARK_ALL_NOTIFICATIONS_AS_READ = gql`
+  mutation MarkAllNotificationsAsRead {
+    readAllNotifications {
+      id
+    }
+  }
+`
+
 export const GET_POST = gql`
   query GetPost($id: ID!) {
     post(id: $id) {

@@ -9,6 +9,8 @@ import { Access } from '../layouts/Access'
 import { yupResolver } from '@hookform/resolvers/yup'
 
 import * as yup from 'yup'
+import axios from 'axios'
+import { useState } from 'react'
 
 interface SignUpInputs {
   email: string
@@ -25,7 +27,7 @@ const signUpFormSchema = yup.object().shape({
   password: yup
     .string()
     .required('Senha obrigatória')
-    .min(12, 'No mínimo 12 caracteres'),
+    .min(8, 'No mínimo 8 caracteres'),
   password_confirmation: yup
     .string()
     .oneOf([null, yup.ref('password')], 'As senhas precisam ser iguais'),
@@ -36,21 +38,51 @@ const SignUp = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<SignUpInputs>({ resolver: yupResolver(signUpFormSchema) })
 
-  const handleSignUp = async (data: SignUpInputs) => {
-    await signUp(data)
+  const [apiError, setApiError] = useState('')
+
+  const handleSignUp = async ({
+    password_confirmation,
+    ...data
+  }: SignUpInputs) => {
+    try {
+      await signUp(data)
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 409) {
+          const responseData = e.response.data as {
+            email?: string
+            profile_name?: string
+          }
+          if (responseData.email) {
+            setError('email', { message: 'Email is already in use' })
+          }
+
+          if (responseData.profile_name) {
+            setError('profile_name', {
+              message: 'Profile name is already in use',
+            })
+          }
+        } else {
+          setApiError('Something went wrong')
+        }
+      }
+    }
   }
 
   return (
     <Access>
       <div className="p-6 mx-auto w-full max-w-[500px]">
-        <Logo />
+        <Logo className="text-4xl" />
         <form
           onSubmit={handleSubmit(handleSignUp)}
           className="mt-4 mx-auto gap-4 flex justify-center align-center flex-col max-w-md"
         >
+          {apiError && <p className="text-red-500">{apiError}</p>}
+
           <InputGroup
             error={errors.name}
             autoFocus

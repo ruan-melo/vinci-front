@@ -26,10 +26,10 @@ export const Textarea = forwardRef(
     ref: ForwardedRef<HTMLTextAreaElement>,
   ) => {
     return (
-      <div className="relative">
+      <div>
         {label && (
           <label
-            className="block text-sm font-medium text-gray-700"
+            className="w-fit block text-sm font-medium text-gray-700"
             htmlFor={name}
           >
             {label}

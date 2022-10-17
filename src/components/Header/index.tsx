@@ -2,47 +2,16 @@ import { Logo } from '../Logo'
 import { PlusIcon } from '@heroicons/react/solid'
 import { Search } from './Search'
 import { UserMenu } from './UserMenu'
-import { Notifications, Notification } from './Notifications'
+import { Notifications } from './Notifications'
 import { NewPostContext } from '../../contexts/NewPostContext'
 import { useContext } from 'react'
-
-const notifications: Notification[] = [
-  {
-    type: 'follow',
-    user: {
-      name: 'John Doe',
-      avatar: '/eu.png',
-    },
-  },
-  {
-    type: 'follow',
-    user: {
-      name: 'John Doe',
-      avatar: '/eu.png',
-    },
-  },
-  {
-    type: 'like',
-    user: {
-      name: 'John Doe',
-      avatar: '/eu.png',
-    },
-  },
-  {
-    type: 'comment',
-    user: {
-      name: 'John Doe',
-      avatar: '/eu.png',
-    },
-  },
-]
 
 export const Header = () => {
   // const isMobile = useMediaQuery('(max-width: 768px)')
   const { open } = useContext(NewPostContext)
 
   return (
-    <header className="bg-white py-4 px-8 flex items-center align-center border-b border-gray-200 w-full">
+    <header className="bg-white-300 py-4 px-8 flex items-center align-center border-b border-gray-200 w-full">
       {/* <Sidebar /> */}
       <Logo link className="text-2xl md:text-4xl " />
       {
@@ -58,7 +27,7 @@ export const Header = () => {
       {<Search />}
       {/* <Search/>  */}
 
-      <Notifications notifications={notifications} />
+      <Notifications />
 
       <UserMenu />
     </header>

@@ -71,7 +71,7 @@ export const Search = () => {
       {search && (
         <div className="hidden peer-focus:flex hover:flex absolute top-full left-0 w-full z-10 p-2  flex-col gap-2 bg-white border rounded-md  border-gray-300 ">
           {searching && (
-            <div className="flex gap-2 ">
+            <div className="flex gap-2 animate-pulse ">
               <div className="h-8 w-8 flex-shrink-0 bg-slate-200 rounded-full" />
 
               <div className=" h-full w-full text-sm">

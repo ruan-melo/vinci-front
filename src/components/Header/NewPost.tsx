@@ -27,11 +27,13 @@ const schema = yup
 
 export const NewPost = () => {
   const { isOpen, close, open } = useContext(NewPostContext)
-  const { register, handleSubmit, watch, reset, resetField, control } =
+  const { register, handleSubmit, watch, reset, resetField, setValue } =
     useForm<Inputs>()
   const formRef = useRef<HTMLFormElement>(null)
 
   const files = watch('files')
+
+  console.log('files', files)
 
   const { images, isLoadingImages } = useImageLoader(files)
 
@@ -66,7 +68,7 @@ export const NewPost = () => {
     }
   }
   const handleClearImages = () => {
-    resetField('files')
+    setValue('files', [])
   }
 
   return (
@@ -89,7 +91,7 @@ export const NewPost = () => {
                 {images.length === 1 && (
                   <div
                     key={`image-${0}-${images[0].name}`}
-                    className="relative mx-auto flex justify-center items-center h-[450px] w-[350px] overflow-hidden"
+                    className="relative mx-auto flex justify-center items-center h-[300px] md:h-[450px] w-[350px] overflow-hidden"
                   >
                     <Image
                       src={images[0].src}
@@ -122,39 +124,44 @@ export const NewPost = () => {
 
             <div className={`h-56 ${files && files.length > 0 && 'hidden'}`}>
               {/* Using Controller is better to work with complex components  */}
-              <Controller
+              {/* <Controller
                 name="files"
                 control={control}
                 render={({ field: { onChange } }) => {
-                  return (
-                    <Dropzone
-                      id="post-image"
-                      onChange={onChange}
-                      name={'name'}
-                      // onBlur={onBlur}
-                      // ref={ref}
-                      // ! MELHORAR MENSAGEM DE ERRO, NEM SEMPRE VAI SER FORMATO DE ARQUIVO INVÁLIDO
-                      onDropRejected={(files) => {
-                        console.log('files rejected', files)
-                        toast(
-                          `Formato de arquivos inválidos: ${files
-                            .map((f) => f.file.name)
-                            .join(', ')}`,
-                        )
-                      }}
-                      options={{
-                        maxFiles: 5,
-                      }}
-                      accept={{
-                        'image/png': ['.png'],
-                        'image/bmp': ['.bmp'],
-                        'image/jpeg': ['.jpeg', '.jpg'],
-                      }}
-                    />
-                    //  {/*(jpeg|png|jpg|bmp)*/}
+                  return ( */}
+              <Dropzone
+                id="post-image"
+                onClick={() => {
+                  toast.info('Click on the image to select a file')
+                }}
+                onChange={(files) => {
+                  setValue('files', files)
+                }}
+                // onChange={() => {
+                //   console.log('onChange')
+                // }}
+                name={'name'}
+                // ! MELHORAR MENSAGEM DE ERRO, NEM SEMPRE VAI SER FORMATO DE ARQUIVO INVÁLIDO
+                onDropRejected={(files) => {
+                  console.log('files rejected', files)
+                  toast(
+                    `Formato de arquivos inválidos: ${files
+                      .map((f) => f.file.name)
+                      .join(', ')}`,
                   )
                 }}
+                options={{
+                  maxFiles: 5,
+                }}
+                accept={{
+                  'image/png': ['.png'],
+                  'image/bmp': ['.bmp'],
+                  'image/jpeg': ['.jpeg', '.jpg'],
+                }}
               />
+              {/* )
+                }}
+              /> */}
             </div>
 
             {/* <label htmlFor='title' className='text-sm'>Title</label> */}

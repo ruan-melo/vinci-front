@@ -5,18 +5,22 @@ import { toast } from 'react-toastify'
 import { api } from '../../../services/api'
 import { client } from '../../../services/apolloClient'
 import { DELETE_POST } from '../../../services/queries'
+import { useAuth } from '../../../hooks/useAuth'
 
 interface PostOptionsProps extends React.HTMLAttributes<HTMLDivElement> {
   postId: string
   onDelete?: () => void
+  authorId: string
 }
 
 export const PostOptions = ({
   className,
   postId,
   onDelete,
+  authorId,
 }: PostOptionsProps) => {
   const { isOpen, onClose, onOpen } = useDisclosure()
+  const { user } = useAuth()
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href)
@@ -74,9 +78,12 @@ export const PostOptions = ({
         className={'max-w-screen-sm'}
       >
         <div className="flex flex-col">
-          <Option className="text-red-600" onClick={handleDeletePost}>
-            Delete
-          </Option>
+          {authorId === user?.id && (
+            <Option className="text-red-600" onClick={handleDeletePost}>
+              Delete
+            </Option>
+          )}
+
           <Option onClick={handleCopyLink}>Copy Link</Option>
           <Option onClick={onClose}>Cancel</Option>
         </div>

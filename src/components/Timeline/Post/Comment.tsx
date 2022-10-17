@@ -20,11 +20,11 @@ export const Comment = ({ text, author, handleDelete }: CommentProps) => {
         <Avatar
           name={author.name}
           avatar={author.avatar}
-          className="h-10 w-10"
+          className="h-8 w-8 md:h-10 md:w-10"
         />
       </div>
 
-      <div className="flex flex-col gap-2 text-sm">
+      <div className="flex flex-col gap-2 text-xs md:text-sm">
         <p>
           <span className="font-bold mr-2">{author.profile_name}</span>
           {text}

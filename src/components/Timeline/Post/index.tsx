@@ -17,6 +17,8 @@ import {
   LIKE_POST,
   REMOVE_LIKE,
 } from '../../../services/queries'
+import { Avatar } from '../../Avatar'
+import Router from 'next/router'
 
 export interface PostProps extends TimelinePost {}
 
@@ -130,25 +132,29 @@ export const Post = ({
 
       <div className="box-border border-none px-4 py-2 bg-opacity-40 flex flex-col gap-2 max-w-full text-gray-700">
         <div className="flex gap-4 items-center overflow-">
-          <div className="w-10 h-10 rounded-full overflow-hidden">
-            <Image
-              className="bg-gray-300 fill-current"
-              src={author.avatar ?? UserAvatar}
-              width={'50px'}
-              height={'50px'}
-              objectFit="cover"
-              alt={'Foto de perfil'}
+          <div
+            className="flex cursor-pointer"
+            onClick={() => {
+              Router.push(`/${author.profile_name}`)
+            }}
+          >
+            <Avatar
+              name={author.name}
+              avatar={author.avatar}
+              className="w-10 h-10 "
             />
-          </div>
-          <div className="flex flex-col ">
-            {author.name}
-            <span className="text-xs w-full text-left">
-              @{author.profile_name}
-            </span>
+
+            <div className="flex flex-col ">
+              {author.name}
+              <span className="text-xs w-full text-left">
+                @{author.profile_name}
+              </span>
+            </div>
           </div>
 
           <PostOptions
             // onDelete={() => {}}
+            authorId={author.id}
             postId={id}
             className="self-start text-gray-600 ml-auto"
           />

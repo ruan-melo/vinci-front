@@ -39,7 +39,7 @@ export const Modal = ({
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
         as="div"
-        className={`relative  bg-red-300 ${containerClassName}`}
+        className={` ${containerClassName}`}
         onClose={closeModal}
       >
         <Transition.Child
@@ -68,7 +68,7 @@ export const Modal = ({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
-                className={` w-full  transform rounded-md bg-white text-left align-middle shadow-xl transition-all ${className}`}
+                className={` w-full rounded-md bg-white text-left align-middle shadow-xl ${className}`}
               >
                 <div className="flex items-center  w-full">
                   {title && (

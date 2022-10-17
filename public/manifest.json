@@ -1,9 +1,9 @@
 {
     "name": "Vinci",
     "short_name": "Vinci",
-    "theme_color": "#138e69",
-    "background_color": "#f8ea48",
-    "display": "browser",
+    "theme_color": "#03543f",
+    "background_color": "#f9fafb",
+    "display": "fullscreen",
     "Scope": "/",
     "start_url": "/",
     "icons": [

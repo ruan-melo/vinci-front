@@ -25,6 +25,7 @@ export const Dropzone = forwardRef(
       labelClassName,
       onChange,
       onBlur,
+      onClick,
       multiple,
       name,
       options,
@@ -34,14 +35,16 @@ export const Dropzone = forwardRef(
     }: DropzoneProps,
     ref: ForwardedRef<HTMLInputElement>,
   ) => {
-    const onDrop = useCallback(
+    const onDropAccepted = useCallback(
       (acceptedFiles: File[]) => {
+        console.log('onDrop')
         onChange(acceptedFiles)
       },
       [onChange],
     )
 
     function formatValidator(file: File): FileError | null {
+      console.log('formatValidator')
       if (!accept) return null
 
       const matchMimeType = accept[file.type]
@@ -67,13 +70,15 @@ export const Dropzone = forwardRef(
       return null
     }
 
-    const { getRootProps, getInputProps, isDragActive, fileRejections } =
-      useDropzone({
-        // ...options,
-        validator: formatValidator,
-        onDrop,
-        onDropRejected,
-      })
+    const { getRootProps, getInputProps, fileRejections } = useDropzone({
+      // ...options,
+      validator: formatValidator,
+      onDrop: () => {
+        console.log('teste')
+      },
+      onDropAccepted,
+      onDropRejected,
+    })
 
     return (
       <div
@@ -84,16 +89,14 @@ export const Dropzone = forwardRef(
         {...getRootProps()}
       >
         <input
-          id={id}
-          name={name}
-          multiple={multiple}
-          {...getInputProps({
-            onBlur,
-          })}
-          onChange={() => {
-            console.log('changed')
-          }}
-          ref={ref}
+          // id={id}
+          // name={name}
+          // multiple={multiple}
+          {...getInputProps()}
+          // onChange={() => {
+          //   console.log('changed')
+          // }}
+          // ref={ref}
         />
         <svg
           xmlns="http://www.w3.org/2000/svg"

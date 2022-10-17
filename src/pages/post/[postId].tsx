@@ -17,7 +17,7 @@ const PagePost = ({ post }: PagePostProps) => {
   }
   return (
     <Main className="max-w-full">
-      <div className="mt-6 h-[600px] mx-auto max-w-7xl bg-white">
+      <div className=" mt-6 md:mx-4 lg:mx-auto max-w-4xl bg-white">
         <Post {...post} />
       </div>
     </Main>

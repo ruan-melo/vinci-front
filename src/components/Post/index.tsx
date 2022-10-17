@@ -157,41 +157,53 @@ export const Post = ({
     Router.reload()
   }
   return (
-    <div className="w-full h-full  grid grid-cols-2 ">
-      <div className="relative w-full max-w-2xl h-full overflow-hidden">
+    <div className="flex flex-wrap m-auto h-full ">
+      <div className=" relative max-w-full min-w-[300px] md:min-w-[400px]  flex-1 min-h-[500px]  ">
         {medias.length > 1 && (
           <ImagesCarousel images={medias.map((m) => ({ src: m.media_url }))} />
         )}
         {medias.length === 1 && (
+          // eslint-disable-next-line jsx-a11y/alt-text
           <Image src={medias[0].media_url} layout="fill" objectFit="cover" />
         )}
       </div>
-      <div className="w-full flex flex-col  ">
-        <div className="flex flex-col  border-b border-gray-100 ">
+      <div className="flex flex-col flex-1 min-w-[300px] ">
+        <div className="flex flex-col  border-b bg-white border-gray-100 ">
           <div className="flex items-center p-4 gap-4">
-            <Avatar
-              className="w-12 h-12"
-              name={author.name}
-              avatar={author.avatar}
-            />
+            <div
+              className="flex gap-2 cursor-pointer"
+              onClick={() => {
+                Router.push(`/${author.profile_name}`)
+              }}
+            >
+              <Avatar
+                className="h-10 w-10 md:w-12 md:h-12"
+                name={author.name}
+                avatar={author.avatar}
+              />
 
-            <div className="flex flex-col   ">
-              {author.name}
-              <span className="text-xs w-full text-left">
-                @{author.profile_name}
-              </span>
+              <div className="flex flex-col   ">
+                {author.name}
+                <span className="text-xs w-full text-left">
+                  @{author.profile_name}
+                </span>
+              </div>
             </div>
 
             <div className="ml-auto">
-              <PostOptions onDelete={onPostDelete} postId={id} />
+              <PostOptions
+                authorId={author.id}
+                onDelete={onPostDelete}
+                postId={id}
+              />
             </div>
           </div>
 
-          <div className="p-4">{caption}</div>
+          <div className="m-4 text-sm">{caption}</div>
         </div>
 
-        <div className="flex-grow flex flex-col">
-          <div className="flex flex-col gap-4 p-4 flex-grow">
+        <div className="flex-grow flex flex-col ">
+          <div className="flex flex-col bg-gray-50 gap-4 p-4 flex-grow">
             {comments.map((comment) => (
               <Comment
                 handleDelete={() => handleDeleteComment(comment.id)}
@@ -210,12 +222,12 @@ export const Post = ({
                                   </div>
                                  */}
           </div>
-          <div className="border-t border-gray-100  p-4 ">
-            <div className="flex gap-4">
+          <div className="border-t border-gray-100 bg-white  ">
+            <div className="flex gap-4 p-4">
               {/* <HeartIconSolid/> */}
               <div className="flex items-center gap-2 text-gray-500">
                 <LikeHeart
-                  className="w-8 h-8 cursor-pointer text-gray-500"
+                  className="h-6 w-6 md:w-8 md:h-8 cursor-pointer text-gray-500"
                   handleLike={handleLike}
                   handleRemoveLike={handleRemoveLike}
                   liked={liked}
@@ -240,7 +252,7 @@ export const Post = ({
 
               <div className=" transition-all duration-200  flex items-center  bg-opacity-30 p-2  gap-2 text-sm text-gray-500">
                 <AnnotationIcon
-                  className="h-8 w-8 text-gray-500"
+                  className="h-6 w-6 md:w-8 md:h-8 text-gray-500"
                   aria-hidden="true"
                 />
                 <span>
@@ -248,10 +260,11 @@ export const Post = ({
                 </span>
               </div>
             </div>
-            <form onSubmit={(e) => handleCreateComment(e)} className="">
+            <form onSubmit={(e) => handleCreateComment(e)} className="mb-4">
               <Textarea
                 name="new-comment"
                 inputClassName="resize-none 
+                text-xs  w-full
                                           bg-gray-100
                                           border-transparent
                                           focus:border-gray-500 focus:bg-white focus:ring-0"

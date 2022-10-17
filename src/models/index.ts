@@ -12,6 +12,7 @@ export interface TimelinePost {
     position: string
   }[]
   author: {
+    id: string
     avatar: string | null
     name: string
     profile_name: string
