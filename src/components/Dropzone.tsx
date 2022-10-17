@@ -37,14 +37,12 @@ export const Dropzone = forwardRef(
   ) => {
     const onDropAccepted = useCallback(
       (acceptedFiles: File[]) => {
-        console.log('onDrop')
         onChange(acceptedFiles)
       },
       [onChange],
     )
 
     function formatValidator(file: File): FileError | null {
-      console.log('formatValidator')
       if (!accept) return null
 
       const matchMimeType = accept[file.type]
@@ -73,9 +71,7 @@ export const Dropzone = forwardRef(
     const { getRootProps, getInputProps, fileRejections } = useDropzone({
       // ...options,
       validator: formatValidator,
-      onDrop: () => {
-        console.log('teste')
-      },
+
       onDropAccepted,
       onDropRejected,
     })

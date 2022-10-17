@@ -15,29 +15,15 @@ export const EditAvatar = () => {
 
   const handleUploadAvatar = async () => {
     if (editorRef.current) {
-      // This returns a HTMLCanvasElement, it can be made into a data URL or a blob,
-      // drawn on another canvas, or added to the DOM.
-      // console.log('getCroppingRect', editorRef.current.getCroppingRect());
-      //  const dataUrl = editorRef.current.getImageScaledToCanvas().toDataURL()
-      //  console.log('dataUrl', dataUrl)
-
       const dataUrl = editorRef.current.getImageScaledToCanvas().toDataURL()
       const result = await fetch(dataUrl)
       const blob = await result.blob()
-      console.log('blob', blob)
+
       const fd = new FormData()
       fd.append('file', blob)
       fd.append('teste', 'cara')
       fd.append('teste2', 'cara2')
       const response = await api.patch('/users/profile/avatar', fd)
-
-      // console.log('blob', blob);
-      // console.log('final',window.URL.createObjectURL(blob))
-
-      // If you want the image resized to the canvas size (also a HTMLCanvasElement)
-      // const canvasScaled = editorRef.current.getImageScaledToCanvas()
-
-      // console.log('CANVAS SCALED', canvasScaled.toDataURL())
     }
   }
 

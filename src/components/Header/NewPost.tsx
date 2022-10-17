@@ -33,8 +33,6 @@ export const NewPost = () => {
 
   const files = watch('files')
 
-  console.log('files', files)
-
   const { images, isLoadingImages } = useImageLoader(files)
 
   const handleClose = () => {
@@ -137,13 +135,9 @@ export const NewPost = () => {
                 onChange={(files) => {
                   setValue('files', files)
                 }}
-                // onChange={() => {
-                //   console.log('onChange')
-                // }}
                 name={'name'}
                 // ! MELHORAR MENSAGEM DE ERRO, NEM SEMPRE VAI SER FORMATO DE ARQUIVO INVÁLIDO
                 onDropRejected={(files) => {
-                  console.log('files rejected', files)
                   toast(
                     `Formato de arquivos inválidos: ${files
                       .map((f) => f.file.name)

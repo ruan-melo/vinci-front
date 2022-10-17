@@ -16,11 +16,6 @@ const firebaseConfig = {
 }
 const app = firebase.initializeApp(firebaseConfig)
 const messaging = firebase.messaging()
-// let access_token = ''
-// messaging.onMessage((payload) => {
-//   console.log('Message received in primeiro plano. ', payload)
-//   // ...
-// })
 
 messaging.onBackgroundMessage(async (payload) => {
   console.log(

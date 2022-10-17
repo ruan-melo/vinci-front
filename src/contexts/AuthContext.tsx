@@ -95,7 +95,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const logout = async () => {
     try {
       const messaging = getFirebaseMessaging()
-      console.log('TESTE')
+
       if (messaging) {
         const token = await getToken(messaging)
         await deleteToken(messaging)
@@ -105,17 +105,14 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
           },
         })
       }
-      console.log('CARALHO')
     } catch (e) {
       toast.error('Erro ao deslogar ' + e)
     }
 
-    console.log('acabando')
-
     userVar(null)
     destroyCookie(null, 'vinci:access_token')
     client.clearStore()
-    console.log('FINAL')
+
     Router.push('/')
   }
 
