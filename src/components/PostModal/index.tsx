@@ -130,7 +130,7 @@ export function PostModal({ post, isPostOpen, closePost }: PostModalProps) {
       isOpen={isPostOpen}
       closeModal={closePost}
       containerClassName={'z-20'}
-      className="h-3/4 lg:h-modal max-w-7xl"
+      className="h-modal max-w-7xl"
     >
       {data && (
         <Post

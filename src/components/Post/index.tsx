@@ -222,7 +222,7 @@ export const Post = ({
                                   </div>
                                  */}
           </div>
-          <div className="border-t border-gray-100 bg-white  ">
+          <div className="border-t border-gray-100 bg-white ">
             <div className="flex gap-4 p-4">
               {/* <HeartIconSolid/> */}
               <div className="flex items-center gap-2 text-gray-500">

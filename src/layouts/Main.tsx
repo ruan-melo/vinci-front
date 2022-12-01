@@ -14,7 +14,9 @@ export const Main = ({ children, className }: MainProps) => {
     <NewPostContextProvider>
       <div id="modal-root" />
       <Header />
-      <main className={className + ' pb-16 md:pb-0'}>{children}</main>
+      <main className={className ?? '' + 'w-full pb-16 md:pb-0'}>
+        {children}
+      </main>
       <BottomBar />
     </NewPostContextProvider>
   )
